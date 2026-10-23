@@ -1,0 +1,371 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+enum InstitutionType {
+  SCHOOL
+  UNIVERSITY
+  OTHER
+}
+
+enum AuthProvider {
+  EMAIL_PASSWORD
+  GOOGLE
+}
+
+enum AcademicPeriodType {
+  SCHOOL_YEAR
+  SEMESTER
+  TRIMESTER
+  QUARTER
+  CUSTOM
+}
+
+enum TaskType {
+  HOMEWORK
+  READING
+  PROJECT
+  LAB
+  PRESENTATION
+  OTHER
+}
+
+enum AssessmentType {
+  EXAM
+  QUIZ
+  MIDTERM
+  FINAL
+  LAB
+  PRESENTATION
+  ASSIGNMENT
+  OTHER
+}
+
+enum AssessmentStatus {
+  SCHEDULED
+  COMPLETED
+  EXCUSED
+}
+
+enum GradingSchemeType {
+  PERCENTAGE
+  WEIGHTED_AVERAGE
+  SCHOOL_BAND
+  UNIVERSITY_GPA
+}
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+}
+
+enum NotificationCategory {
+  TASK_REMINDER
+  ASSESSMENT_REMINDER
+}
+
+enum NotificationReferenceType {
+  TASK
+  ASSESSMENT
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED
+}
+
+// -----------------------------------------------------------------------------
+// Models
+// -----------------------------------------------------------------------------
+
+model User {
+  id                      String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                   String                   @unique @db.VarChar(320)
+  emailVerified           Boolean                  @default(false)
+  displayName             String                   @db.VarChar(100)
+  avatarUrl               String?                  @db.Text
+  timezone                String                   @default("UTC") @db.VarChar(64)
+  languageCode            String                   @default("en") @db.VarChar(10)
+  institutionType         InstitutionType          @default(OTHER)
+  createdAt               DateTime                 @default(now()) @db.Timestamptz
+  updatedAt               DateTime                 @default(now()) @updatedAt @db.Timestamptz
+
+  identities              AuthIdentity[]
+  refreshSessions         RefreshSession[]
+  periods                 AcademicPeriod[]
+  subjects                Subject[]
+  classSessions           ClassSession[]
+  tasks                   Task[]
+  assessments             Assessment[]
+  gradingSchemes          GradingScheme[]
+  courseGrades            CourseGrade[]
+  devices                 Device[]
+  notificationPreferences NotificationPreference[]
+  notificationDeliveries  NotificationDelivery[]
+
+  @@index([createdAt])
+}
+
+model AuthIdentity {
+  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String       @db.Uuid
+  provider          AuthProvider
+  providerAccountId String       @db.Text
+  passwordHash      String?      @db.Text
+  createdAt         DateTime     @default(now()) @db.Timestamptz
+  updatedAt         DateTime     @default(now()) @updatedAt @db.Timestamptz
+
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model RefreshSession {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique @db.Text
+  deviceInfo String?   @db.Text
+  ipAddress  String?   @db.Text
+  expiresAt  DateTime  @db.Timestamptz
+  revokedAt  DateTime? @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model AcademicPeriod {
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String             @db.Uuid
+  name          String             @db.VarChar(100)
+  type          AcademicPeriodType
+  startDate     DateTime           @db.Date
+  endDate       DateTime           @db.Date
+  isArchived    Boolean            @default(false)
+  createdAt     DateTime           @default(now()) @db.Timestamptz
+  updatedAt     DateTime           @default(now()) @updatedAt @db.Timestamptz
+
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects      Subject[]
+  classSessions ClassSession[]
+  tasks         Task[]
+  assessments   Assessment[]
+
+  @@index([userId, isArchived])
+  @@index([userId, startDate])
+}
+
+model Subject {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String         @db.Uuid
+  periodId        String         @db.Uuid
+  gradingSchemeId String?        @db.Uuid
+  name            String         @db.VarChar(150)
+  colorHex        String?        @db.Char(7)
+  teacherName     String?        @db.VarChar(100)
+  creditHours     Decimal?       @db.Decimal(4, 1)
+  isArchived      Boolean        @default(false)
+  createdAt       DateTime       @default(now()) @db.Timestamptz
+  updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamptz
+
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  period          AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  gradingScheme   GradingScheme? @relation(fields: [gradingSchemeId], references: [id], onDelete: SetNull)
+  classSessions   ClassSession[]
+  tasks           Task[]
+  assessments     Assessment[]
+  courseGrades    CourseGrade[]
+
+  @@unique([id, periodId])
+  @@index([userId, periodId])
+  @@index([userId, isArchived])
+}
+
+model ClassSession {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String         @db.Uuid
+  subjectId     String         @db.Uuid
+  periodId      String         @db.Uuid
+  weekday       Int            @db.SmallInt
+  startTime     DateTime       @db.Time
+  endTime       DateTime       @db.Time
+  location      String?        @db.VarChar(150)
+  effectiveFrom DateTime       @db.Date
+  effectiveTo   DateTime?      @db.Date
+  createdAt     DateTime       @default(now()) @db.Timestamptz
+  updatedAt     DateTime       @default(now()) @updatedAt @db.Timestamptz
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject       Subject        @relation(fields: [subjectId, periodId], references: [id, periodId], onDelete: Cascade)
+  period        AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+
+  @@index([userId, subjectId])
+  @@index([userId, periodId, weekday])
+}
+
+model Task {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String          @db.Uuid
+  subjectId   String?         @db.Uuid
+  periodId    String?         @db.Uuid
+  title       String          @db.VarChar(255)
+  description String?         @db.Text
+  taskType    TaskType        @default(OTHER)
+  dueAt       DateTime?       @db.Timestamptz
+  completedAt DateTime?       @db.Timestamptz
+  createdAt   DateTime        @default(now()) @db.Timestamptz
+  updatedAt   DateTime        @default(now()) @updatedAt @db.Timestamptz
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     Subject?        @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  period      AcademicPeriod? @relation(fields: [periodId], references: [id], onDelete: SetNull)
+
+  @@index([userId, dueAt])
+  @@index([userId, subjectId])
+  @@index([userId, completedAt])
+}
+
+model Assessment {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String           @db.Uuid
+  subjectId      String           @db.Uuid
+  periodId       String           @db.Uuid
+  title          String           @db.VarChar(255)
+  assessmentType AssessmentType
+  scheduledAt    DateTime         @db.Timestamptz
+  status         AssessmentStatus @default(SCHEDULED)
+  rawScore       Decimal?         @db.Decimal(8, 2)
+  maxScore       Decimal?         @db.Decimal(8, 2)
+  weight         Decimal          @default(1.0) @db.Decimal(6, 4)
+  notes          String?          @db.Text
+  createdAt      DateTime         @default(now()) @db.Timestamptz
+  updatedAt      DateTime         @default(now()) @updatedAt @db.Timestamptz
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject        Subject          @relation(fields: [subjectId, periodId], references: [id, periodId], onDelete: Cascade)
+  period         AcademicPeriod   @relation(fields: [periodId], references: [id], onDelete: Cascade)
+
+  @@index([userId, subjectId])
+  @@index([userId, periodId])
+  @@index([userId, scheduledAt])
+  @@index([userId, status])
+}
+
+model GradingScheme {
+  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String            @db.Uuid
+  name         String            @db.VarChar(100)
+  schemeType   GradingSchemeType
+  version      Int               @default(1)
+  isDefault    Boolean           @default(false)
+  createdAt    DateTime          @default(now()) @db.Timestamptz
+  updatedAt    DateTime          @default(now()) @updatedAt @db.Timestamptz
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scaleEntries GradeScaleEntry[]
+  subjects     Subject[]
+  courseGrades CourseGrade[]
+
+  @@index([userId])
+  @@index([userId, isDefault])
+}
+
+model GradeScaleEntry {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schemeId      String        @db.Uuid
+  label         String        @db.VarChar(20)
+  minPercentage Decimal       @db.Decimal(5, 2)
+  maxPercentage Decimal       @db.Decimal(5, 2)
+  gradePoints   Decimal?      @db.Decimal(4, 2)
+  sortOrder     Int           @db.SmallInt
+
+  scheme        GradingScheme @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+
+  @@index([schemeId, sortOrder])
+}
+
+model CourseGrade {
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String         @db.Uuid
+  subjectId           String         @db.Uuid
+  schemeId            String?        @db.Uuid
+  schemeVersion       Int
+  computedPercentage  Decimal?       @db.Decimal(5, 2)
+  computedBand        String?        @db.VarChar(20)
+  computedGradePoints Decimal?       @db.Decimal(4, 2)
+  assessmentsIncluded Int            @default(0)
+  assessmentsExcluded Int            @default(0)
+  totalWeight         Decimal?       @db.Decimal(6, 4)
+  isManualOverride    Boolean        @default(false)
+  overrideNotes       String?        @db.Text
+  calculatedAt        DateTime       @default(now()) @db.Timestamptz
+  createdAt           DateTime       @default(now()) @db.Timestamptz
+
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject             Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  scheme              GradingScheme? @relation(fields: [schemeId], references: [id], onDelete: SetNull)
+
+  @@index([userId, subjectId, calculatedAt(sort: Desc), createdAt(sort: Desc)])
+  @@index([userId, subjectId])
+}
+
+model Device {
+  id            String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String                 @db.Uuid
+  expoPushToken String                 @unique @db.Text
+  platform      DevicePlatform
+  deviceLabel   String?                @db.VarChar(100)
+  lastSeenAt    DateTime               @default(now()) @db.Timestamptz
+  createdAt     DateTime               @default(now()) @db.Timestamptz
+
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries    NotificationDelivery[]
+
+  @@index([userId])
+}
+
+model NotificationPreference {
+  id              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String               @db.Uuid
+  category        NotificationCategory
+  isEnabled       Boolean              @default(true)
+  leadTimeMinutes Int
+  updatedAt       DateTime             @default(now()) @updatedAt @db.Timestamptz
+
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category])
+}
+
+model NotificationDelivery {
+  id            String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String                    @db.Uuid
+  deviceId      String?                   @db.Uuid
+  referenceType NotificationReferenceType
+  referenceId   String                    @db.Uuid
+  scheduledFor  DateTime                  @db.Timestamptz
+  status        NotificationStatus        @default(PENDING)
+  errorMessage  String?                   @db.Text
+  sentAt        DateTime?                 @db.Timestamptz
+  createdAt     DateTime                  @default(now()) @db.Timestamptz
+
+  user          User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device        Device?                   @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([referenceType, referenceId])
+  @@index([scheduledFor, status])
+}

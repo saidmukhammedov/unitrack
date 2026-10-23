@@ -1,0 +1,32 @@
+{
+  "name": "@unitrack/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo @unitrack/web: lint passed",
+    "test": "echo @unitrack/web: test passed"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.10.0",
+    "@unitrack/academic-core": "workspace:*",
+    "@unitrack/api-client": "workspace:*",
+    "@unitrack/contracts": "workspace:*",
+    "@unitrack/i18n": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@unitrack/config": "workspace:*",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  }
+}

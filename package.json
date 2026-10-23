@@ -1,0 +1,17 @@
+{
+  "name": "unitrack-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cross-platform academic planner for school and university students",
+  "scripts": {
+    "build": "pnpm --recursive run build",
+    "lint": "pnpm --recursive run lint",
+    "typecheck": "pnpm --recursive run typecheck",
+    "test": "pnpm --recursive run test"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "packageManager": "pnpm@12.15.0"
+}

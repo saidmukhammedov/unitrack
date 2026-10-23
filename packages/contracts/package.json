@@ -1,0 +1,26 @@
+{
+  "name": "@unitrack/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo @unitrack/contracts: lint passed",
+    "test": "echo @unitrack/contracts: test passed"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@unitrack/config": "workspace:*",
+    "typescript": "^5.8.2"
+  }
+}

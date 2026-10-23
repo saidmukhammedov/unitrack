@@ -1,0 +1,128 @@
+{
+  "common": {
+    "appName": "UniTrack",
+    "welcome": "Xush kelibsiz",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "create": "Yaratish",
+    "add": "Qo'shish",
+    "loading": "Yuklanmoqda...",
+    "confirm": "Ishonchingiz komilmi?",
+    "actions": "Amallar",
+    "back": "Orqaga",
+    "signOut": "Chiqish",
+    "retry": "Qayta urinish",
+    "statusOk": "OK",
+    "current": "Joriy",
+    "yes": "Ha",
+    "no": "Yo'q"
+  },
+  "nav": {
+    "dashboard": "Bosh sahifa",
+    "periods": "O'quv davrlari",
+    "subjects": "Fanlar",
+    "timetable": "Dars jadvali",
+    "tasks": "Vazifalar",
+    "assessments": "Baholar",
+    "schemes": "Baholash tizimi",
+    "settings": "Sozlamalar"
+  },
+  "periods": {
+    "title": "O'quv davrlari",
+    "description": "Semestrlar, trimestrlar yoki o'quv yillarini boshqaring.",
+    "addPeriod": "O'quv davri qo'shish",
+    "name": "Davr nomi",
+    "type": "Turi",
+    "startDate": "Boshlanish sanasi",
+    "endDate": "Tugash sanasi",
+    "currentPeriod": "Joriy o'quv davri",
+    "noPeriods": "Hozircha o'quv davrlari kiritilmagan."
+  },
+  "subjects": {
+    "title": "Fanlar va kurslar",
+    "description": "Kurslar, kredit soatlari va o'qituvchilarni boshqaring.",
+    "addSubject": "Fan qo'shish",
+    "name": "Fan nomi",
+    "code": "Kurs kodi",
+    "teacher": "O'qituvchi",
+    "credits": "Kredit soati",
+    "color": "Rang mavzusi",
+    "noSubjects": "Bu davr uchun fanlar kiritilmagan."
+  },
+  "timetable": {
+    "title": "Haftalik dars jadvali",
+    "description": "Barcha yozilgan fanlar uchun takrorlanuvchi haftalik jadval.",
+    "scheduleSession": "Dars mashg'ulotini rejalashtirish",
+    "weekday": "Hafta kuni",
+    "startTime": "Boshlanish vaqti",
+    "endTime": "Tugash vaqti",
+    "room": "Auditoriya / Xona",
+    "classesToday": "Bugungi darslar",
+    "noClasses": "Bugun darslar rejalashtirilmagan"
+  },
+  "tasks": {
+    "title": "Vazifalar va topshiriqlar",
+    "description": "Uy vazifalari, o'qish materiallari va muddatlarni kuzatib boring.",
+    "newTask": "Yangi vazifa",
+    "taskTitle": "Sarlavha",
+    "priority": "Muhimlik darajasi",
+    "dueAt": "Topshirish muddati",
+    "pending": "Kutilayotgan",
+    "completed": "Bajarilgan",
+    "all": "Barchasi",
+    "noTasks": "Vazifalar topilmadi."
+  },
+  "assessments": {
+    "title": "Nazoratlar va imtihon baholari",
+    "description": "Imtihonlar, testlar, laboratoriya baholari va ularning salmog'ini qayd eting.",
+    "addAssessment": "Baholash yozuvi qo'shish",
+    "assessmentTitle": "Nazorat nomi",
+    "type": "Turi",
+    "score": "Olingan ball",
+    "maxScore": "Maksimal ball",
+    "weight": "Salmog'i (%)",
+    "status": "Holati",
+    "scheduled": "Rejalashtirilgan",
+    "completed": "Tugallangan",
+    "excused": "Ozod etilgan",
+    "noAssessments": "Hozircha baholar kiritilmagan."
+  },
+  "grades": {
+    "title": "Baholash va natijalar",
+    "schemesTitle": "Baholash tizimlari",
+    "description": "Baholash shkalalarini sozlang va kredit bo'yicha o'rtacha GPA ko'rsatkichini hisoblang.",
+    "addScheme": "Baholash tizimi yaratish",
+    "schemeName": "Tizim nomi",
+    "schemeType": "Tizim turi",
+    "bands": "Baho diapazonlari",
+    "minPercent": "Min %",
+    "maxPercent": "Maks %",
+    "gradePoints": "Baho ballari (GPA)",
+    "gpaTitle": "Davr bo'yicha umumiy GPA",
+    "totalCredits": "Jami kreditlar",
+    "subjectAverage": "Fan o'rtachasi",
+    "computedBand": "Baho belgisi",
+    "excludedTitle": "GPA hisobiga kirmagan kurslar",
+    "noGpaEligible": "Hozirda GPA hisoblash uchun mos kurslar mavjud emas"
+  },
+  "settings": {
+    "title": "Hisob sozlamalari",
+    "profile": "Foydalanuvchi profili",
+    "language": "Til",
+    "timezone": "Vaqt mintaqasi",
+    "institution": "Ta'lim muassasasi turi",
+    "activeSessions": "Faol kirish seanslari"
+  },
+  "notifications": {
+    "taskReminder": {
+      "title": "Vazifa muddati yaqinlashmoqda",
+      "body": "\"{{taskTitle}}\" vazifasini topshirishga {{leadTime}} qoldi."
+    },
+    "assessmentReminder": {
+      "title": "Yaqinlashib kelayotgan nazorat",
+      "body": "{{subjectName}} fanidan \"{{assessmentTitle}}\" nazoratiga {{leadTime}} qoldi."
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@unitrack/config",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared configuration for UniTrack applications and packages",
+  "main": "index.js",
+  "files": [
+    "tsconfig.base.json",
+    "tsconfig.node.json",
+    "tsconfig.web.json",
+    "prettier.config.js"
+  ],
+  "scripts": {
+    "lint": "echo \"@unitrack/config: no lint required\"",
+    "typecheck": "echo \"@unitrack/config: no typecheck required\"",
+    "build": "echo \"@unitrack/config: no build required\"",
+    "test": "echo \"@unitrack/config: no test required\""
+  }
+}

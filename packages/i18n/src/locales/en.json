@@ -1,0 +1,128 @@
+{
+  "common": {
+    "appName": "UniTrack",
+    "welcome": "Welcome back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "loading": "Loading...",
+    "confirm": "Are you sure?",
+    "actions": "Actions",
+    "back": "Back",
+    "signOut": "Sign Out",
+    "retry": "Retry",
+    "statusOk": "OK",
+    "current": "Current",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "periods": "Periods",
+    "subjects": "Subjects",
+    "timetable": "Timetable",
+    "tasks": "Tasks",
+    "assessments": "Assessments",
+    "schemes": "Grading Schemes",
+    "settings": "Settings"
+  },
+  "periods": {
+    "title": "Academic Periods",
+    "description": "Manage semesters, trimesters, or school years.",
+    "addPeriod": "Add Academic Period",
+    "name": "Period Name",
+    "type": "Type",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "currentPeriod": "Current Academic Period",
+    "noPeriods": "No academic periods configured yet."
+  },
+  "subjects": {
+    "title": "Subjects & Courses",
+    "description": "Manage courses, credit weights, and course instructors.",
+    "addSubject": "Add Subject",
+    "name": "Subject Name",
+    "code": "Course Code",
+    "teacher": "Instructor / Teacher",
+    "credits": "Credit Hours",
+    "color": "Color Theme",
+    "noSubjects": "No subjects added for this period yet."
+  },
+  "timetable": {
+    "title": "Weekly Timetable",
+    "description": "Recurring weekly schedule for all enrolled subjects.",
+    "scheduleSession": "Schedule a Class Session",
+    "weekday": "Weekday",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "room": "Room / Hall",
+    "classesToday": "Classes Today",
+    "noClasses": "No classes scheduled for today"
+  },
+  "tasks": {
+    "title": "Tasks & Assignments",
+    "description": "Track homework, readings, project milestones, and deadlines.",
+    "newTask": "New Task",
+    "taskTitle": "Title",
+    "priority": "Priority",
+    "dueAt": "Due Date & Time",
+    "pending": "Pending",
+    "completed": "Completed",
+    "all": "All",
+    "noTasks": "No tasks found."
+  },
+  "assessments": {
+    "title": "Assessments & Exam Grades",
+    "description": "Record exam results, quizzes, coursework scores, and weights with full score integrity.",
+    "addAssessment": "Add Assessment Record",
+    "assessmentTitle": "Assessment Title",
+    "type": "Type",
+    "score": "Raw Score",
+    "maxScore": "Max Score",
+    "weight": "Weight (%)",
+    "status": "Status",
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "excused": "Excused",
+    "noAssessments": "No assessments recorded yet."
+  },
+  "grades": {
+    "title": "Grading & Performance",
+    "schemesTitle": "Grading Schemes",
+    "description": "Configure grade scales, letter bands, and compute credit-weighted GPA.",
+    "addScheme": "Create Grading Scheme",
+    "schemeName": "Scheme Name",
+    "schemeType": "Scheme Type",
+    "bands": "Grade Bands",
+    "minPercent": "Min %",
+    "maxPercent": "Max %",
+    "gradePoints": "Grade Points (GPA)",
+    "gpaTitle": "Cumulative Period GPA",
+    "totalCredits": "Total Credits",
+    "subjectAverage": "Subject Average",
+    "computedBand": "Letter Band",
+    "excludedTitle": "Excluded Courses from GPA",
+    "noGpaEligible": "No courses currently eligible for GPA calculation"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "profile": "User Profile",
+    "language": "Language",
+    "timezone": "Timezone",
+    "institution": "Institution Type",
+    "activeSessions": "Active Login Sessions"
+  },
+  "notifications": {
+    "taskReminder": {
+      "title": "Task Due Soon",
+      "body": "\"{{taskTitle}}\" is due in {{leadTime}}."
+    },
+    "assessmentReminder": {
+      "title": "Upcoming Assessment",
+      "body": "\"{{assessmentTitle}}\" in {{subjectName}} is in {{leadTime}}."
+    }
+  }
+}

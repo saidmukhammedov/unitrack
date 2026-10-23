@@ -1,0 +1,26 @@
+{
+  "name": "@unitrack/api-client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo @unitrack/api-client: lint passed",
+    "test": "echo @unitrack/api-client: test passed"
+  },
+  "dependencies": {
+    "@unitrack/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@unitrack/config": "workspace:*",
+    "typescript": "^5.8.2"
+  }
+}

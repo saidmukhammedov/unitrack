@@ -1,0 +1,27 @@
+# Render Blueprint specification for UniTrack Staging API
+services:
+  - type: web
+    name: unitrack-api-staging
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: corepack enable && corepack prepare pnpm@12.15.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @unitrack/contracts build && pnpm --filter @unitrack/i18n build && pnpm --filter @unitrack/academic-core build && pnpm --filter @unitrack/api-client build && pnpm --filter @unitrack/api build
+    startCommand: pnpm --filter @unitrack/api exec prisma migrate deploy && node apps/api/dist/index.js
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
+      - key: COOKIE_SAME_SITE
+        value: lax
+      - key: APP_BASE_URL
+        sync: false
