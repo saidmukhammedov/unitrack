@@ -7,7 +7,12 @@
     "build": "pnpm --recursive run build",
     "lint": "pnpm --recursive run lint",
     "typecheck": "pnpm --recursive run typecheck",
-    "test": "pnpm --recursive run test"
+    "test": "pnpm --recursive run test",
+    "render:build": "pnpm install --frozen-lockfile && pnpm --filter @unitrack/contracts build && pnpm --filter @unitrack/i18n build && pnpm --filter @unitrack/academic-core build && pnpm --filter @unitrack/api-client build && pnpm --filter @unitrack/api build",
+    "render:start": "pnpm --filter @unitrack/api exec prisma migrate deploy && node apps/api/dist/index.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "devDependencies": {
     "prettier": "^3.5.3",

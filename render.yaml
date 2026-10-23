@@ -5,10 +5,12 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: corepack enable && corepack prepare pnpm@12.15.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @unitrack/contracts build && pnpm --filter @unitrack/i18n build && pnpm --filter @unitrack/academic-core build && pnpm --filter @unitrack/api-client build && pnpm --filter @unitrack/api build
-    startCommand: pnpm --filter @unitrack/api exec prisma migrate deploy && node apps/api/dist/index.js
+    buildCommand: npm install --no-save pnpm@12.15.0 && npm run render:build
+    startCommand: npm run render:start
     healthCheckPath: /api/v1/health
     envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
       - key: NODE_ENV
         value: production
       - key: PORT
