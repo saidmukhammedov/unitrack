@@ -126,7 +126,7 @@ export const authService = {
           email: input.email,
           displayName: input.displayName,
           languageCode: input.languageCode,
-          emailVerified: false,
+          emailVerified: true,
         },
       });
 
@@ -143,11 +143,8 @@ export const authService = {
       return newUser;
     });
 
-    const verificationToken = generateEmailVerificationToken(user.id, user.email);
-    await sendVerificationEmail(user.email, verificationToken);
-
     return {
-      message: 'Verification email sent. Please check your inbox.',
+      message: 'Account created successfully.',
     };
   },
 
@@ -211,11 +208,11 @@ export const authService = {
     }
 
     if (!user.emailVerified) {
-      throw new AuthError(
-        403,
-        'EMAIL_NOT_VERIFIED',
-        'Please verify your email address before logging in.'
-      );
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true },
+      });
+      user.emailVerified = true;
     }
 
     const accessToken = generateAccessToken({
@@ -269,12 +266,29 @@ export const authService = {
       });
 
       if (existingEmailUser) {
-        throw new AuthError(
-          409,
-          'ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL',
-          'An account already exists with this email address. Please log in with your password.'
-        );
-      }
+        // Link Google identity to existing user account and verify email
+        await prisma.authIdentity.upsert({
+          where: {
+            provider_providerAccountId: {
+              provider: 'GOOGLE',
+              providerAccountId: googleUser.sub,
+            },
+          },
+          update: {},
+          create: {
+            userId: existingEmailUser.id,
+            provider: 'GOOGLE',
+            providerAccountId: googleUser.sub,
+          },
+        });
+        if (!existingEmailUser.emailVerified) {
+          await prisma.user.update({
+            where: { id: existingEmailUser.id },
+            data: { emailVerified: true },
+          });
+        }
+        user = existingEmailUser;
+      } else {
 
       // Create new user and Google identity
       user = await prisma.$transaction(async (tx) => {
@@ -297,6 +311,7 @@ export const authService = {
 
         return newUser;
       });
+      }
     }
 
     const accessToken = generateAccessToken({

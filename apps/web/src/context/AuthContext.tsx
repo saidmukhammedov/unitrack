@@ -44,8 +44,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (input: RegisterInput) => {
-    const res = await api.register(input);
-    return res.message;
+    await api.register(input);
+    try {
+      const loginRes = await api.login({
+        email: input.email,
+        password: input.password,
+      });
+      setUser(loginRes.user);
+      return 'Welcome to UniTrack! Account created successfully.';
+    } catch {
+      return 'Account created successfully. Please sign in.';
+    }
   };
 
   const googleAuth = async (input: GoogleAuthInput) => {

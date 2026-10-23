@@ -4,6 +4,7 @@ import { app } from '../src/app';
 import { prisma } from '../src/lib/prisma';
 import { sentMailsHistory } from '../src/lib/mailer';
 import { setMockGoogleVerify } from '../src/lib/google-auth';
+import { generateEmailVerificationToken } from '../src/lib/jwt';
 
 const TEST_EMAIL = `student-${Date.now()}@example.com`;
 const TEST_PASSWORD = 'Str0ng!Password123';
@@ -59,7 +60,7 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
       expect(res.body.error.code).toBe('VALIDATION_ERROR');
     });
 
-    it('successfully registers new user with argon2 hash and sends verification email', async () => {
+    it('successfully registers new user with argon2 hash directly', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
         .send({
@@ -70,7 +71,7 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
         });
 
       expect(res.status).toBe(201);
-      expect(res.body.message).toContain('Verification email sent');
+      expect(res.body.message).toContain('Account created successfully');
 
       // Verify user in database
       const dbUser = await prisma.user.findUnique({
@@ -80,7 +81,7 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
 
       expect(dbUser).not.toBeNull();
       userId = dbUser!.id;
-      expect(dbUser!.emailVerified).toBe(false);
+      expect(dbUser!.emailVerified).toBe(true);
       expect(dbUser!.languageCode).toBe('uz');
       expect(dbUser!.identities.length).toBe(1);
 
@@ -90,11 +91,8 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
       expect(identity.providerAccountId).toBe(dbUser!.id); // D-01 / I-19 check
       expect(identity.passwordHash).toMatch(/^\$argon2id\$/);
 
-      // Check mailer captured verification token
-      const lastMail = sentMailsHistory[sentMailsHistory.length - 1];
-      expect(lastMail.to).toBe(TEST_EMAIL);
-      expect(lastMail.token).toBeDefined();
-      verificationToken = lastMail.token!;
+      // Generate verification token for verification endpoint test
+      verificationToken = generateEmailVerificationToken(userId, TEST_EMAIL);
     });
 
     it('rejects duplicate registration with 409', async () => {
@@ -112,10 +110,10 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 2. Email Verification & Pre-verification Login Gate
+  // 2. Email Verification & Immediate Login Access
   // ---------------------------------------------------------------------------
-  describe('Email Verification & Login Gate', () => {
-    it('blocks login if email is not yet verified with 403', async () => {
+  describe('Email Verification & Login Access', () => {
+    it('allows immediate login after registration without blocking email gate', async () => {
       const res = await request(app)
         .post('/api/v1/auth/login')
         .send({
@@ -123,8 +121,8 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
           password: TEST_PASSWORD,
         });
 
-      expect(res.status).toBe(403);
-      expect(res.body.error.code).toBe('EMAIL_NOT_VERIFIED');
+      expect(res.status).toBe(200);
+      expect(res.body.accessToken).toBeDefined();
     });
 
     it('rejects invalid or tampered verification token with 400', async () => {
@@ -136,7 +134,7 @@ describe('Authentication & Account Security Flow (Phase 3)', () => {
       expect(res.body.error.code).toBe('INVALID_OR_EXPIRED_TOKEN');
     });
 
-    it('successfully verifies email with valid token', async () => {
+    it('successfully verifies email with valid token if called', async () => {
       const res = await request(app)
         .post('/api/v1/auth/verify-email')
         .send({ token: verificationToken });
