@@ -14,19 +14,19 @@ export const sentMailsHistory: SentMailRecord[] = [];
 
 let transporter: nodemailer.Transporter | null = null;
 
-function getTransporter(): nodemailer.Transporter {
+function getTransporter(): nodemailer.Transporter | null {
+  if (!env.SMTP_USER || !env.SMTP_PASS) {
+    return null;
+  }
   if (!transporter) {
     transporter = nodemailer.createTransport({
       host: env.SMTP_HOST,
       port: env.SMTP_PORT,
       secure: env.SMTP_PORT === 465,
-      auth:
-        env.SMTP_USER && env.SMTP_PASS
-          ? {
-              user: env.SMTP_USER,
-              pass: env.SMTP_PASS,
-            }
-          : undefined,
+      auth: {
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+      },
     });
   }
   return transporter;
@@ -57,8 +57,13 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
     return;
   }
 
+  const mailer = getTransporter();
+  if (!mailer) {
+    console.log(`[MAILER] SMTP credentials not set. Verification link for ${to}: ${verificationUrl}`);
+    return;
+  }
+
   try {
-    const mailer = getTransporter();
     await mailer.sendMail({
       from: env.SMTP_FROM,
       to,
@@ -96,8 +101,13 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
     return;
   }
 
+  const mailer = getTransporter();
+  if (!mailer) {
+    console.log(`[MAILER] SMTP credentials not set. Password reset link for ${to}: ${resetUrl}`);
+    return;
+  }
+
   try {
-    const mailer = getTransporter();
     await mailer.sendMail({
       from: env.SMTP_FROM,
       to,
