@@ -12,3 +12,4 @@ coverage/
 Thumbs.db
 .bin/
 .corepack/
+.vercel/
