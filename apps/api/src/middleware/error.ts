@@ -59,7 +59,7 @@ export function errorHandler(
     return;
   }
 
-  if (err instanceof ZodError) {
+  if (err instanceof ZodError || err.name === 'ZodError') {
     res.status(400).json({
       error: {
         code: 'VALIDATION_ERROR',
