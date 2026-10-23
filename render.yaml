@@ -5,8 +5,8 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: npm install --no-save pnpm@12.15.0 && npm run render:build
-    startCommand: npm run render:start
+    buildCommand: bash scripts/render-build.sh
+    startCommand: bash scripts/render-start.sh
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_VERSION
