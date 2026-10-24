@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/api';
 import type { NotificationPreference } from '@unitrack/contracts';
+import { User, Bell, Key, AlertTriangle, Check, Shield } from 'lucide-react';
 
 export function SettingsView() {
   const { user, refreshProfile, logout } = useAuth();
@@ -80,7 +81,7 @@ export function SettingsView() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you absolutely sure you want to delete your account? All academic records will be permanently removed.')) {
+    if (!window.confirm('Are you absolutely sure you want to delete your account? All records will be permanently removed.')) {
       return;
     }
     setErrorMsg(null);
@@ -93,113 +94,149 @@ export function SettingsView() {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: '2rem auto', padding: '1.5rem' }}>
-      <h2>Account Settings</h2>
+    <div className="max-w-3xl mx-auto space-y-10 pb-20">
+      {/* Header */}
+      <header className="border-b border-[#E5E3D8] pb-8 pt-2">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5 text-[11px] font-mono-tabular tracking-wider uppercase text-[#74726A]">
+            <span>Account Ledger</span>
+            <span className="text-[#D8D5C8]">•</span>
+            <span>Preferences & Security</span>
+          </div>
+          <h1 className="font-serif-chronicle text-3xl sm:text-5xl text-[#171614] font-normal tracking-tight">
+            Account Settings
+          </h1>
+          <p className="text-xs text-[#74726A] max-w-xl">
+            Configure identity parameters, localized timestamps, and notification lead times.
+          </p>
+        </div>
+      </header>
 
+      {/* Status Messages */}
       {statusMsg && (
-        <div style={{ color: 'green', marginBottom: '1rem', padding: '0.75rem', background: '#e8f5e9', borderRadius: 4 }}>
-          {statusMsg}
+        <div className="p-3.5 rounded bg-[#2C4839]/10 border border-[#2C4839]/20 text-[#2C4839] text-xs flex items-center gap-2">
+          <Check className="w-4 h-4 shrink-0" />
+          <span>{statusMsg}</span>
         </div>
       )}
       {errorMsg && (
-        <div style={{ color: 'red', marginBottom: '1rem', padding: '0.75rem', background: '#ffebee', borderRadius: 4 }}>
-          {errorMsg}
+        <div className="p-3.5 rounded bg-[#A33F17]/10 border border-[#A33F17]/20 text-[#A33F17] text-xs flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>{errorMsg}</span>
         </div>
       )}
 
-      <div style={{ background: '#f9f9f9', padding: '1.5rem', borderRadius: 8, marginBottom: '2rem' }}>
-        <h3>Profile Information</h3>
-        <form onSubmit={handleUpdateProfile}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4 }}>Display Name</label>
+      {/* Profile Section */}
+      <section className="p-6 rounded border border-[#E5E3D8] bg-[#FBFBF9] space-y-6">
+        <div className="flex items-baseline gap-2 border-b border-[#E5E3D8] pb-3">
+          <User className="w-4 h-4 text-[#171614]" />
+          <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal">
+            Profile Information
+          </h2>
+        </div>
+
+        <form onSubmit={handleUpdateProfile} className="space-y-4">
+          <div>
+            <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+              Display Name
+            </label>
             <input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
+              className="w-full text-sm"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4 }}>Preferred Language</label>
-            <select
-              value={languageCode}
-              onChange={(e) => setLanguageCode(e.target.value as any)}
-              style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
-            >
-              <option value="en">English (en)</option>
-              <option value="uz">O'zbek (uz)</option>
-              <option value="ru">Русский (ru)</option>
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                Preferred Language
+              </label>
+              <select
+                value={languageCode}
+                onChange={(e) => setLanguageCode(e.target.value as any)}
+                className="w-full text-xs font-mono-tabular"
+              >
+                <option value="en">English (en)</option>
+                <option value="uz">O'zbek (uz)</option>
+                <option value="ru">Русский (ru)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                Timezone
+              </label>
+              <input
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                placeholder="e.g. Asia/Tashkent"
+                className="w-full text-xs font-mono-tabular"
+              />
+            </div>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4 }}>Timezone</label>
-            <input
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              placeholder="e.g. Asia/Tashkent"
-              style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4 }}>Institution Type</label>
+          <div>
+            <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+              Institution Affiliation (Optional)
+            </label>
             <select
               value={institutionType}
               onChange={(e) => setInstitutionType(e.target.value as any)}
-              style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
+              className="w-full text-xs font-mono-tabular"
             >
               <option value="SCHOOL">School</option>
               <option value="UNIVERSITY">University</option>
-              <option value="OTHER">Other</option>
+              <option value="OTHER">Independent / Other</option>
             </select>
           </div>
 
-          <button
-            type="submit"
-            style={{ padding: '0.6rem 1.2rem', background: '#0066cc', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-          >
-            Save Profile
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors cursor-pointer"
+            >
+              Save Profile
+            </button>
+          </div>
         </form>
-      </div>
+      </section>
 
-      {/* Notification / Reminder Preferences */}
-      <div style={{ background: '#f9f9f9', padding: '1.5rem', borderRadius: 8, marginBottom: '2rem' }}>
-        <h3>Reminder Preferences</h3>
-        <p style={{ fontSize: 13, color: '#666', marginTop: -4, marginBottom: 16 }}>
-          Configure push notification lead times for tasks and examinations.
-        </p>
+      {/* Reminder Preferences */}
+      <section className="p-6 rounded border border-[#E5E3D8] bg-[#FBFBF9] space-y-6">
+        <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-3">
+          <div className="flex items-baseline gap-2">
+            <Bell className="w-4 h-4 text-[#171614]" />
+            <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal">
+              Reminder Preferences
+            </h2>
+          </div>
+          <span className="text-[11px] font-mono-tabular text-[#74726A]">Push & Device Lead Times</span>
+        </div>
 
         {prefLoading ? (
-          <p style={{ color: '#777', fontSize: 13 }}>Loading reminder preferences...</p>
+          <p className="text-xs font-mono-tabular text-[#74726A]">Loading preferences...</p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="space-y-3">
             {preferences.map((p) => (
               <div
                 key={p.category}
-                style={{
-                  background: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: 6,
-                  padding: 12,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
+                className="p-4 rounded border border-[#E5E3D8] bg-[#F4F3ED]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
                 <div>
-                  <strong>{p.category === 'TASK_REMINDER' ? 'Task Due Reminders' : 'Exam & Assessment Reminders'}</strong>
-                  <div style={{ fontSize: 12, color: '#718096', marginTop: 2 }}>
-                    Trigger notification before deadline
-                  </div>
+                  <h4 className="text-sm font-medium text-[#171614]">
+                    {p.category === 'TASK_REMINDER' ? 'Task Due Reminders' : 'Exam & Assessment Reminders'}
+                  </h4>
+                  <p className="text-xs text-[#74726A]">
+                    Trigger notification prior to stated deadline
+                  </p>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="flex items-center gap-3">
                   <select
                     value={p.leadTimeMinutes}
                     onChange={(e) => handleUpdatePref(p.category, p.isEnabled, parseInt(e.target.value, 10))}
-                    style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid #cbd5e0' }}
+                    className="text-xs font-mono-tabular py-1 px-2.5"
                   >
                     <option value={30}>30 minutes before</option>
                     <option value={60}>1 hour before</option>
@@ -210,11 +247,12 @@ export function SettingsView() {
                     <option value={10080}>1 week before</option>
                   </select>
 
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+                  <label className="flex items-center gap-2 text-xs font-mono-tabular text-[#171614] cursor-pointer">
                     <input
                       type="checkbox"
                       checked={p.isEnabled}
                       onChange={(e) => handleUpdatePref(p.category, e.target.checked, p.leadTimeMinutes)}
+                      className="cursor-pointer"
                     />
                     Enabled
                   </label>
@@ -223,65 +261,93 @@ export function SettingsView() {
             ))}
           </div>
         )}
-      </div>
+      </section>
 
-      <div style={{ background: '#f9f9f9', padding: '1.5rem', borderRadius: 8, marginBottom: '2rem' }}>
-        <h3>Change Password</h3>
-        <form onSubmit={handleChangePassword}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4 }}>Current Password</label>
-            <input
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
-              required
-            />
+      {/* Change Password */}
+      <section className="p-6 rounded border border-[#E5E3D8] bg-[#FBFBF9] space-y-6">
+        <div className="flex items-baseline gap-2 border-b border-[#E5E3D8] pb-3">
+          <Key className="w-4 h-4 text-[#171614]" />
+          <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal">
+            Change Password
+          </h2>
+        </div>
+
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                Current Password
+              </label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full text-xs"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                New Password
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min 8 chars, 1 uppercase, 1 digit"
+                className="w-full text-xs"
+                required
+              />
+            </div>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: 4 }}>New Password</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min 8 chars, 1 uppercase, 1 digit"
-              style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
-              required
-            />
+          <div className="pt-2">
+            <button
+              type="submit"
+              className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors cursor-pointer"
+            >
+              Update Password
+            </button>
           </div>
-
-          <button
-            type="submit"
-            style={{ padding: '0.6rem 1.2rem', background: '#333', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-          >
-            Update Password
-          </button>
         </form>
-      </div>
+      </section>
 
-      <div style={{ background: '#fff0f0', padding: '1.5rem', borderRadius: 8, border: '1px solid #ffcdd2' }}>
-        <h3 style={{ color: '#c62828' }}>Danger Zone</h3>
-        <p style={{ fontSize: 14, color: '#555' }}>
-          Deleting your account will permanently remove all subjects, timetables, grades, and sessions.
+      {/* Danger Zone */}
+      <section className="p-6 rounded border border-[#A33F17]/30 bg-[#A33F17]/5 space-y-4">
+        <div className="flex items-baseline gap-2 border-b border-[#A33F17]/20 pb-3">
+          <Shield className="w-4 h-4 text-[#A33F17]" />
+          <h2 className="font-serif-chronicle text-2xl text-[#A33F17] font-normal">
+            Danger Zone
+          </h2>
+        </div>
+
+        <p className="text-xs text-[#74726A] leading-relaxed">
+          Deleting your account will irreversibly remove all commitments, tasks, habits, and academic records. This operation cannot be undone.
         </p>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>Confirm with Password (if email user)</label>
+
+        <div className="max-w-sm space-y-2">
+          <label className="text-[11px] font-mono-tabular text-[#74726A] block">
+            Confirm with Password (if email registered user)
+          </label>
           <input
             type="password"
             value={confirmDeletePassword}
             onChange={(e) => setConfirmDeletePassword(e.target.value)}
             placeholder="Your current password"
-            style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }}
+            className="w-full text-xs"
           />
         </div>
-        <button
-          onClick={handleDeleteAccount}
-          style={{ padding: '0.6rem 1.2rem', background: '#c62828', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
-        >
-          Delete Account Permanently
-        </button>
-      </div>
+
+        <div className="pt-2">
+          <button
+            onClick={handleDeleteAccount}
+            className="px-4 py-2 bg-[#A33F17] hover:bg-[#853211] text-[#FBFBF9] rounded text-xs font-medium transition-colors cursor-pointer"
+          >
+            Delete Account Permanently
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

@@ -3,189 +3,89 @@
 @layer utilities {
   .font-serif-chronicle {
     font-family: 'Newsreader', Georgia, serif;
+    font-feature-settings: 'cv01' 1, 'cv02' 1;
+  }
+  .font-sans-editorial {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .font-mono-tabular {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-feature-settings: 'tnum' 1;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
   }
 }
 
 @layer base {
   :root {
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg-paper: #FBFBF9;
+    --bg-paper-warm: #F4F3ED;
+    --bg-paper-dark: #ECEAE1;
+    --rule-hairline: #E5E3D8;
+    --rule-subtle: #D8D5C8;
+    --ink-black: #171614;
+    --ink-charcoal: #383733;
+    --ink-muted: #74726A;
+    --ink-faint: #A8A69E;
+    --accent-terracotta: #A33F17;
+    --accent-sage: #2C4839;
+    --accent-navy: #1E2D42;
   }
 
   body {
-    font-family: var(--font-sans);
-    background-color: #020617;
-    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-paper);
+    color: var(--ink-black);
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    selection-background-color: #E6DFCE;
+    selection-color: #171614;
   }
 
   * {
     box-sizing: border-box;
   }
+
+  ::selection {
+    background-color: #E8E2D5;
+    color: #171614;
+  }
 }
 
-/* Global Modern UI Styling for Academic Views */
-main h2 {
-  color: #ffffff !important;
-  font-weight: 800 !important;
-  font-size: 1.5rem !important;
-  letter-spacing: -0.025em !important;
-  margin-bottom: 0.5rem !important;
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F4F3ED;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D5C8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #BCB9AB;
 }
 
-main h2 + p {
-  color: #94a3b8 !important;
-  font-size: 0.875rem !important;
-  margin-bottom: 1.5rem !important;
+/* Subtle editorial paper texture & typography rules */
+.paper-rule {
+  border-color: #E5E3D8;
 }
 
-/* Forms & Panels */
-main form,
-main .card-panel,
-main div[style*="background: #f8fafc"],
-main div[style*="background: #fff"],
-main div[style*="background: rgb(248, 250, 252)"],
-main div[style*="background: rgb(255, 255, 255)"] {
-  background: rgba(15, 23, 42, 0.85) !important;
-  border: 1px solid rgba(51, 65, 85, 0.7) !important;
-  border-radius: 1.25rem !important;
-  color: #f8fafc !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2) !important;
+.paper-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E3D8;
+  box-shadow: 0 1px 2px rgba(23, 22, 20, 0.03);
 }
 
-main form h3 {
-  color: #f8fafc !important;
-  font-weight: 700 !important;
-  font-size: 1.1rem !important;
-  letter-spacing: -0.015em !important;
+.paper-panel {
+  background-color: #F7F6F0;
+  border: 1px solid #E2DFD3;
 }
 
-main form label {
-  color: #94a3b8 !important;
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-}
-
-/* Form inputs & dropdowns */
-main input,
-main select,
-main textarea {
-  background: rgba(2, 6, 23, 0.7) !important;
-  border: 1px solid rgba(51, 65, 85, 0.8) !important;
-  color: #f8fafc !important;
-  border-radius: 0.75rem !important;
-  padding: 0.625rem 0.875rem !important;
-  font-size: 0.875rem !important;
-  transition: all 0.15s ease-in-out !important;
-}
-
-main input::placeholder,
-main textarea::placeholder {
-  color: #64748b !important;
-}
-
-main input:focus,
-main select:focus,
-main textarea:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) !important;
-  outline: none !important;
-}
-
-main select option {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-}
-
-/* Submit & Primary Buttons */
-main button[type="submit"] {
-  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%) !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 0.75rem !important;
-  font-weight: 600 !important;
-  font-size: 0.875rem !important;
-  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.35) !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  cursor: pointer !important;
-}
-
-main button[type="submit"]:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.45) !important;
-}
-
-/* Tables & Lists */
-main table {
-  background: rgba(15, 23, 42, 0.75) !important;
-  border: 1px solid rgba(51, 65, 85, 0.7) !important;
-  border-radius: 1rem !important;
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
-  overflow: hidden !important;
-  width: 100% !important;
-  color: #f8fafc !important;
-}
-
-main table thead {
-  background: rgba(30, 41, 59, 0.8) !important;
-  color: #94a3b8 !important;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
-  font-size: 0.75rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-}
-
-main table th,
-main table td {
-  padding: 0.75rem 1rem !important;
-}
-
-main table tbody tr {
-  border-bottom: 1px solid rgba(51, 65, 85, 0.4) !important;
-  transition: background-color 0.15s ease !important;
-}
-
-main table tbody tr:hover {
-  background-color: rgba(30, 41, 59, 0.45) !important;
-}
-
-/* Alert Boxes */
-main div[style*="background: #fff5f5"],
-main div[style*="background: rgb(255, 245, 245)"] {
-  background: rgba(244, 63, 94, 0.1) !important;
-  border: 1px solid rgba(244, 63, 94, 0.25) !important;
-  color: #fda4af !important;
-  border-radius: 0.75rem !important;
-}
-
-main div[style*="background: #e8f5e9"],
-main div[style*="background: rgb(232, 245, 233)"] {
-  background: rgba(16, 185, 129, 0.1) !important;
-  border: 1px solid rgba(16, 185, 129, 0.25) !important;
-  color: #6ee7b7 !important;
-  border-radius: 0.75rem !important;
-}
-
-/* Item cards in lists */
-main div[style*="background: #f7fafc"],
-main div[style*="background: rgb(247, 250, 252)"] {
-  background: rgba(2, 6, 23, 0.6) !important;
-  border: 1px solid rgba(51, 65, 85, 0.6) !important;
-  border-radius: 0.75rem !important;
-  color: #f8fafc !important;
-}
-
-main div[style*="background: #f7fafc"] strong,
-main div[style*="background: rgb(247, 250, 252)"] strong {
-  color: #ffffff !important;
+/* Focus state for accessibility */
+*:focus-visible {
+  outline: 2px solid #171614;
+  outline-offset: 2px;
 }

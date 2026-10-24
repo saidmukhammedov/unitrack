@@ -110,48 +110,52 @@ export function HabitsView() {
   if (isLoading) {
     return (
       <div className="py-24 text-center">
-        <p className="font-serif-chronicle italic text-slate-400 text-lg">
-          Gathering daily rhythms...
+        <div className="w-6 h-6 border-2 border-[#171614] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="font-serif-chronicle italic text-[#74726A] text-lg">
+          Gathering daily rhythms & rituals...
         </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-16">
-      {/* Header */}
-      <header className="border-b border-slate-800 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-slate-400 font-semibold mb-1">
-            <span>Rhythm & Cadence</span>
-            <span className="text-slate-600">•</span>
-            <span>Habit Mastery</span>
+    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+      {/* Editorial Header */}
+      <header className="border-b border-[#E5E3D8] pb-8 pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5 text-[11px] font-mono-tabular tracking-wider uppercase text-[#74726A]">
+            <span>Cadence Ledger</span>
+            <span className="text-[#D8D5C8]">•</span>
+            <span className="text-[#A33F17] font-semibold">Habit Mastery</span>
           </div>
-          <h1 className="font-serif-chronicle text-3xl sm:text-4xl text-slate-100 font-normal tracking-tight">
+          <h1 className="font-serif-chronicle text-3xl sm:text-5xl text-[#171614] font-normal tracking-tight">
             Habits & Daily Cadence
           </h1>
+          <p className="text-xs text-[#74726A] max-w-xl">
+            Repetition establishes character. Log recurring intentions and observe your personal velocity across seasons.
+          </p>
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-semibold shadow-md transition-all self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] rounded text-xs font-medium transition-all self-start sm:self-auto cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           <span>New Habit</span>
         </button>
       </header>
 
-      {/* Habit List */}
+      {/* Habit Cards & Matrix */}
       {habits.length === 0 ? (
-        <div className="py-16 text-center border border-dashed border-slate-800 rounded-2xl bg-slate-950/40">
-          <Flame className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-sm font-semibold text-slate-300">No habits tracked yet</h3>
-          <p className="text-xs text-slate-500 mt-1 mb-4">
-            Build consistency with daily rituals, weekday routines, or weekly targets.
+        <div className="py-16 text-center border border-dashed border-[#E5E3D8] rounded bg-[#F4F3ED]/40">
+          <Flame className="w-8 h-8 text-[#A33F17] mx-auto mb-3 opacity-60" />
+          <h3 className="font-serif-chronicle text-xl text-[#171614]">No habits registered</h3>
+          <p className="text-xs text-[#74726A] mt-1 mb-5 max-w-sm mx-auto">
+            Build consistency with daily rituals, weekday routines, or targeted weekly rhythms.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-xs font-medium border border-amber-500/30 transition-colors"
+            className="px-4 py-2 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] rounded text-xs font-medium transition-colors cursor-pointer"
           >
             Create Your First Habit
           </button>
@@ -161,59 +165,59 @@ export function HabitsView() {
           {habits.map((h) => (
             <div
               key={h.id}
-              className="p-5 rounded-2xl border border-slate-800 bg-slate-900/60 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all"
+              className="p-5 rounded border border-[#E5E3D8] bg-[#FBFBF9] hover:border-[#D8D5C8] flex flex-col justify-between space-y-5 transition-all"
             >
               <div>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {h.contextName && (
                         <span
-                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          className="px-1.5 py-0.2 rounded text-[10px] font-mono-tabular border"
                           style={{
-                            backgroundColor: `${h.contextColor || '#6366f1'}20`,
-                            color: h.contextColor || '#818cf8',
+                            borderColor: `${h.contextColor || '#171614'}40`,
+                            color: h.contextColor || '#171614',
                           }}
                         >
                           {h.contextName}
                         </span>
                       )}
 
-                      <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                      <span className="text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A]">
                         {h.frequencyType === 'DAILY' && 'Every Day'}
                         {h.frequencyType === 'SELECTED_WEEKDAYS' && 'Scheduled Weekdays'}
                         {h.frequencyType === 'WEEKLY_TARGET' && `${h.targetPerWeek}x / week`}
                       </span>
                     </div>
 
-                    <h3 className="font-serif-chronicle text-xl text-slate-100 font-normal">
+                    <h3 className="font-serif-chronicle text-xl text-[#171614] font-normal leading-snug">
                       {h.title}
                     </h3>
                   </div>
 
                   {/* Streak Flame Badge */}
                   <div className="flex flex-col items-end shrink-0">
-                    <div className="flex items-center gap-1 text-sm font-mono-tabular font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
-                      <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    <div className="flex items-center gap-1 text-sm font-mono-tabular font-semibold text-[#A33F17] bg-[#A33F17]/10 border border-[#A33F17]/20 px-2.5 py-1 rounded">
+                      <Flame className="w-3.5 h-3.5 text-[#A33F17]" />
                       <span>{h.currentStreak}</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 mt-1 font-mono-tabular">
+                    <span className="text-[10px] text-[#74726A] mt-1 font-mono-tabular">
                       Best: {h.longestStreak}
                     </span>
                   </div>
                 </div>
 
                 {h.frequencyType === 'SELECTED_WEEKDAYS' && h.selectedWeekdays.length > 0 && (
-                  <div className="flex items-center gap-1 mt-3">
+                  <div className="flex items-center gap-1 mt-4">
                     {weekdayNames.map((name, idx) => {
                       const isSelected = h.selectedWeekdays.includes(idx);
                       return (
                         <span
                           key={idx}
-                          className={`w-6 h-6 rounded-md text-[10px] font-semibold flex items-center justify-center ${
+                          className={`w-6 h-6 rounded text-[10px] font-mono-tabular flex items-center justify-center ${
                             isSelected
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                              : 'bg-slate-950 text-slate-600'
+                              ? 'bg-[#171614] text-[#FBFBF9] font-medium'
+                              : 'bg-[#F4F3ED] text-[#74726A] border border-[#E5E3D8]'
                           }`}
                         >
                           {(name || '').charAt(0)}
@@ -225,10 +229,10 @@ export function HabitsView() {
               </div>
 
               {/* Action buttons */}
-              <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="pt-3 border-t border-[#E5E3D8] flex items-center justify-between">
                 <button
                   onClick={() => handleDeleteHabit(h.id)}
-                  className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors"
+                  className="p-1.5 text-[#74726A] hover:text-[#A33F17] rounded transition-colors cursor-pointer"
                   title="Delete habit"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -237,14 +241,14 @@ export function HabitsView() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleLogOccurrence(h.id, 'SKIPPED')}
-                    className="text-xs text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="text-xs font-mono-tabular text-[#74726A] hover:text-[#171614] px-2.5 py-1 rounded transition-colors cursor-pointer"
                     title="Skip today without breaking streak"
                   >
                     Skip
                   </button>
                   <button
                     onClick={() => handleLogOccurrence(h.id, 'COMPLETED')}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] text-xs font-medium rounded transition-colors cursor-pointer"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>Done Today</span>
@@ -258,18 +262,23 @@ export function HabitsView() {
 
       {/* CREATE HABIT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif-chronicle text-xl text-slate-100">Create Habit</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-[#171614]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FBFBF9] border border-[#D8D5C8] rounded shadow-xl max-w-md w-full p-6 space-y-5">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-3">
+              <h3 className="font-serif-chronicle text-2xl text-[#171614]">Create Habit</h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-[#74726A] hover:text-[#171614]"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateHabit} className="space-y-4 !bg-transparent !border-0 !p-0 !shadow-none">
+            <form onSubmit={handleCreateHabit} className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Habit Title</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Habit Title
+                </label>
                 <input
                   type="text"
                   required
@@ -277,11 +286,14 @@ export function HabitsView() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full text-sm"
+                  autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Context</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Context
+                </label>
                 <select
                   value={contextId}
                   onChange={(e) => setContextId(e.target.value)}
@@ -297,11 +309,13 @@ export function HabitsView() {
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Cadence / Frequency</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Cadence / Frequency
+                </label>
                 <select
                   value={frequencyType}
                   onChange={(e: any) => setFrequencyType(e.target.value)}
-                  className="w-full text-xs"
+                  className="w-full text-xs font-mono-tabular"
                 >
                   <option value="DAILY">Every Day</option>
                   <option value="SELECTED_WEEKDAYS">Selected Weekdays</option>
@@ -311,7 +325,9 @@ export function HabitsView() {
 
               {frequencyType === 'SELECTED_WEEKDAYS' && (
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1.5">Active Weekdays</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1.5">
+                    Active Weekdays
+                  </label>
                   <div className="flex gap-1.5">
                     {weekdayNames.map((name, idx) => {
                       const isSelected = selectedWeekdays.includes(idx);
@@ -320,10 +336,10 @@ export function HabitsView() {
                           key={idx}
                           type="button"
                           onClick={() => toggleWeekday(idx)}
-                          className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          className={`flex-1 py-1.5 rounded text-xs font-mono-tabular transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-amber-400 text-slate-950 font-bold'
-                              : 'bg-slate-950 text-slate-400 border border-slate-800'
+                              ? 'bg-[#171614] text-[#FBFBF9] font-semibold'
+                              : 'bg-[#F4F3ED] text-[#74726A] border border-[#E5E3D8]'
                           }`}
                         >
                           {name}
@@ -336,29 +352,31 @@ export function HabitsView() {
 
               {frequencyType === 'WEEKLY_TARGET' && (
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Target times per week</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Target times per week
+                  </label>
                   <input
                     type="number"
                     min={1}
                     max={7}
                     value={targetPerWeek}
                     onChange={(e) => setTargetPerWeek(Number(e.target.value))}
-                    className="w-full text-xs"
+                    className="w-full text-xs font-mono-tabular"
                   />
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E3D8]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-mono-tabular text-[#74726A] hover:text-[#171614]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-md"
+                  className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors"
                 >
                   Save Habit
                 </button>

@@ -140,47 +140,54 @@ export function GoalsView() {
   if (isLoading) {
     return (
       <div className="py-24 text-center">
-        <p className="font-serif-chronicle italic text-slate-400 text-lg">
-          Loading meaningful aspirations...
+        <div className="w-6 h-6 border-2 border-[#171614] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="font-serif-chronicle italic text-[#74726A] text-lg">
+          Charting strategic horizons & aspirations...
         </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-16">
-      {/* Header */}
-      <header className="border-b border-slate-800 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-slate-400 font-semibold mb-1">
-            <span>Aspirations & Horizon</span>
-            <span className="text-slate-600">•</span>
-            <span>Strategic Direction</span>
+    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+      {/* Editorial Header */}
+      <header className="border-b border-[#E5E3D8] pb-8 pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5 text-[11px] font-mono-tabular tracking-wider uppercase text-[#74726A]">
+            <span>Horizons Ledger</span>
+            <span className="text-[#D8D5C8]">•</span>
+            <span className="text-[#1E2D42] font-semibold">Strategic Direction</span>
           </div>
-          <h1 className="font-serif-chronicle text-3xl sm:text-4xl text-slate-100 font-normal tracking-tight">
+          <h1 className="font-serif-chronicle text-3xl sm:text-5xl text-[#171614] font-normal tracking-tight">
             Goals & Key Milestones
           </h1>
+          <p className="text-xs text-[#74726A] max-w-xl">
+            Long-term aspirations broken into verifiable checkpoints. Measure your progress by tangible milestones achieved.
+          </p>
         </div>
 
         <button
           onClick={() => setIsGoalModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] rounded text-xs font-medium transition-all self-start sm:self-auto cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           <span>New Goal</span>
         </button>
       </header>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[11px] font-mono-tabular uppercase tracking-wider text-[#74726A] mr-1">
+          Status:
+        </span>
         {['ALL', 'IN_PROGRESS', 'COMPLETED', 'PAUSED'].map((status) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+            className={`px-3 py-1 text-xs rounded transition-all cursor-pointer font-mono-tabular ${
               statusFilter === status
-                ? 'bg-slate-200 text-slate-900 font-semibold'
-                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                ? 'bg-[#171614] text-[#FBFBF9] font-medium'
+                : 'text-[#74726A] hover:text-[#171614] hover:bg-[#F4F3ED] border border-[#E5E3D8]'
             }`}
           >
             {status.replace('_', ' ')}
@@ -190,21 +197,21 @@ export function GoalsView() {
 
       {/* Goal Cards */}
       {filteredGoals.length === 0 ? (
-        <div className="py-16 text-center border border-dashed border-slate-800 rounded-2xl bg-slate-950/40">
-          <Target className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-sm font-semibold text-slate-300">No goals found</h3>
-          <p className="text-xs text-slate-500 mt-1 mb-4">
-            Set deliberate goals and decompose them into actionable milestones.
+        <div className="py-16 text-center border border-dashed border-[#E5E3D8] rounded bg-[#F4F3ED]/40">
+          <Target className="w-8 h-8 text-[#1E2D42] mx-auto mb-3 opacity-60" />
+          <h3 className="font-serif-chronicle text-xl text-[#171614]">No goals found</h3>
+          <p className="text-xs text-[#74726A] mt-1 mb-5 max-w-sm mx-auto">
+            Set deliberate goals and decompose them into actionable, accountable milestones.
           </p>
           <button
             onClick={() => setIsGoalModalOpen(true)}
-            className="px-3.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 rounded-lg text-xs font-medium border border-indigo-500/30 transition-colors"
+            className="px-4 py-2 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] rounded text-xs font-medium transition-colors cursor-pointer"
           >
             Create Your First Goal
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {filteredGoals.map((goal) => {
             const isExpanded = expandedGoalIds.has(goal.id);
             const isCompleted = goal.status === 'COMPLETED' || goal.progressPercentage === 100;
@@ -212,17 +219,17 @@ export function GoalsView() {
             return (
               <div
                 key={goal.id}
-                className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden transition-all"
+                className="rounded border border-[#E5E3D8] bg-[#FBFBF9] hover:border-[#D8D5C8] transition-all overflow-hidden"
               >
                 {/* Goal summary header */}
                 <div className="p-5 flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-[10px] ${
+                        className={`text-[10px] px-2 py-0.5 rounded font-mono-tabular uppercase tracking-wider border ${
                           isCompleted
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30'
+                            ? 'bg-[#2C4839]/10 text-[#2C4839] border-[#2C4839]/20'
+                            : 'bg-[#1E2D42]/10 text-[#1E2D42] border-[#1E2D42]/20'
                         }`}
                       >
                         {goal.status.replace('_', ' ')}
@@ -230,10 +237,10 @@ export function GoalsView() {
 
                       {goal.contextName && (
                         <span
-                          className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                          className="px-1.5 py-0.2 rounded text-[10px] font-mono-tabular border"
                           style={{
-                            backgroundColor: `${goal.contextColor || '#6366f1'}20`,
-                            color: goal.contextColor || '#818cf8',
+                            borderColor: `${goal.contextColor || '#171614'}40`,
+                            color: goal.contextColor || '#171614',
                           }}
                         >
                           {goal.contextName}
@@ -241,31 +248,31 @@ export function GoalsView() {
                       )}
 
                       {goal.targetDate && (
-                        <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono-tabular">
-                          <Calendar className="w-3 h-3 text-slate-500" /> Target: {goal.targetDate}
+                        <span className="text-[11px] text-[#74726A] flex items-center gap-1 font-mono-tabular">
+                          <Calendar className="w-3 h-3 text-[#74726A]" /> Target: {goal.targetDate}
                         </span>
                       )}
                     </div>
 
-                    <h3 className="font-serif-chronicle text-xl text-slate-100 font-normal">
+                    <h3 className="font-serif-chronicle text-2xl text-[#171614] font-normal">
                       {goal.title}
                     </h3>
 
                     {goal.description && (
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      <p className="text-xs text-[#74726A] leading-relaxed max-w-2xl">
                         {goal.description}
                       </p>
                     )}
 
                     {/* Progress Bar */}
                     <div className="mt-4 flex items-center gap-3">
-                      <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
+                      <div className="flex-1 h-1.5 rounded-full bg-[#E5E3D8] overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500"
+                          className="h-full bg-[#171614] transition-all duration-500"
                           style={{ width: `${goal.progressPercentage}%` }}
                         />
                       </div>
-                      <span className="font-mono-tabular text-xs font-bold text-slate-300 w-12 text-right">
+                      <span className="font-mono-tabular text-xs font-semibold text-[#171614] w-12 text-right">
                         {goal.progressPercentage}%
                       </span>
                     </div>
@@ -275,14 +282,14 @@ export function GoalsView() {
                   <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={() => handleDeleteGoal(goal.id)}
-                      className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors"
+                      className="p-1.5 text-[#74726A] hover:text-[#A33F17] rounded transition-colors cursor-pointer"
                       title="Delete Goal"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => toggleExpand(goal.id)}
-                      className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                      className="p-1.5 text-[#74726A] hover:text-[#171614] rounded transition-colors cursor-pointer"
                     >
                       {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                     </button>
@@ -291,12 +298,12 @@ export function GoalsView() {
 
                 {/* Milestones list (collapsible) */}
                 {isExpanded && (
-                  <div className="border-t border-slate-800/80 bg-slate-950/40 p-5 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                  <div className="border-t border-[#E5E3D8] bg-[#F4F3ED]/40 p-5 space-y-4">
+                    <div className="flex items-center justify-between text-xs text-[#74726A] font-mono-tabular uppercase tracking-wider">
                       <span>Actionable Milestones ({goal.milestones.length})</span>
                       <button
                         onClick={() => setAddingMilestoneGoalId(goal.id)}
-                        className="text-indigo-400 hover:text-indigo-300 text-[11px] flex items-center gap-1 capitalize"
+                        className="text-[#171614] hover:underline text-xs flex items-center gap-1 cursor-pointer"
                       >
                         <Plus className="w-3 h-3" /> Add Milestone
                       </button>
@@ -306,7 +313,7 @@ export function GoalsView() {
                     {addingMilestoneGoalId === goal.id && (
                       <form
                         onSubmit={(e) => handleCreateMilestone(goal.id, e)}
-                        className="flex gap-2 !bg-transparent !border-0 !p-0 !shadow-none"
+                        className="flex gap-2"
                       >
                         <input
                           type="text"
@@ -318,14 +325,14 @@ export function GoalsView() {
                         />
                         <button
                           type="submit"
-                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold"
+                          className="px-3 py-1 bg-[#171614] text-[#FBFBF9] rounded text-xs font-medium"
                         >
                           Add
                         </button>
                         <button
                           type="button"
                           onClick={() => setAddingMilestoneGoalId(null)}
-                          className="px-2 text-xs text-slate-500 hover:text-white"
+                          className="px-2 text-xs font-mono-tabular text-[#74726A] hover:text-[#171614]"
                         >
                           Cancel
                         </button>
@@ -333,35 +340,35 @@ export function GoalsView() {
                     )}
 
                     {goal.milestones.length === 0 ? (
-                      <p className="text-xs text-slate-500 italic">No milestones defined yet.</p>
+                      <p className="text-xs text-[#74726A] font-serif-chronicle italic">
+                        No milestones defined yet. Break this horizon into incremental steps.
+                      </p>
                     ) : (
-                      <div className="space-y-2">
+                      <div className="divide-y divide-[#E5E3D8] border border-[#E5E3D8] rounded bg-[#FBFBF9]">
                         {goal.milestones.map((m) => (
                           <div
                             key={m.id}
-                            className={`p-2.5 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
-                              m.isCompleted
-                                ? 'bg-slate-900/30 border-slate-800/50 opacity-60'
-                                : 'bg-slate-900/70 border-slate-800'
+                            className={`p-3 flex items-center justify-between gap-3 transition-colors ${
+                              m.isCompleted ? 'opacity-40 bg-[#F4F3ED]/30' : 'hover:bg-[#F4F3ED]/40'
                             }`}
                           >
                             <button
                               onClick={() => handleToggleMilestone(goal.id, m.id, m.isCompleted)}
-                              className={`rounded cursor-pointer ${
-                                m.isCompleted ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'
-                              }`}
+                              className="text-[#171614] cursor-pointer"
                             >
                               {m.isCompleted ? (
-                                <CheckCircle2 className="w-4 h-4" />
+                                <div className="w-4 h-4 rounded-xs border border-[#2C4839] bg-[#2C4839] text-[#FBFBF9] flex items-center justify-center">
+                                  <Check className="w-3 h-3" />
+                                </div>
                               ) : (
-                                <Circle className="w-4 h-4" />
+                                <div className="w-4 h-4 rounded-xs border border-[#74726A] hover:border-[#171614] bg-[#FBFBF9]" />
                               )}
                             </button>
 
                             <div className="flex-1 min-w-0">
                               <span
-                                className={`text-xs font-medium block truncate ${
-                                  m.isCompleted ? 'line-through text-slate-500' : 'text-slate-200'
+                                className={`text-xs block truncate ${
+                                  m.isCompleted ? 'line-through text-[#74726A]' : 'text-[#171614] font-medium'
                                 }`}
                               >
                                 {m.title}
@@ -369,7 +376,7 @@ export function GoalsView() {
                             </div>
 
                             {m.targetDate && (
-                              <span className="font-mono-tabular text-[10px] text-slate-500">
+                              <span className="font-mono-tabular text-[10px] text-[#74726A]">
                                 {m.targetDate}
                               </span>
                             )}
@@ -387,18 +394,23 @@ export function GoalsView() {
 
       {/* CREATE GOAL MODAL */}
       {isGoalModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif-chronicle text-xl text-slate-100">Set New Goal</h3>
-              <button onClick={() => setIsGoalModalOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-[#171614]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FBFBF9] border border-[#D8D5C8] rounded shadow-xl max-w-lg w-full p-6 space-y-5">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-3">
+              <h3 className="font-serif-chronicle text-2xl text-[#171614]">Set New Goal</h3>
+              <button
+                onClick={() => setIsGoalModalOpen(false)}
+                className="text-[#74726A] hover:text-[#171614]"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateGoal} className="space-y-4 !bg-transparent !border-0 !p-0 !shadow-none">
+            <form onSubmit={handleCreateGoal} className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Goal Title</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Goal Title
+                </label>
                 <input
                   type="text"
                   required
@@ -406,11 +418,14 @@ export function GoalsView() {
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="w-full text-sm"
+                  autoFocus
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Description (Optional)</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Description (Optional)
+                </label>
                 <textarea
                   rows={2}
                   placeholder="Why does this matter? What does success look like?"
@@ -422,16 +437,20 @@ export function GoalsView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Target Date</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Target Date
+                  </label>
                   <input
                     type="date"
                     value={newTargetDate}
                     onChange={(e) => setNewTargetDate(e.target.value)}
-                    className="w-full text-xs"
+                    className="w-full text-xs font-mono-tabular"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Context</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Context
+                  </label>
                   <select
                     value={newContextId}
                     onChange={(e) => setNewContextId(e.target.value)}
@@ -449,7 +468,9 @@ export function GoalsView() {
 
               {/* Initial Milestones */}
               <div className="space-y-2">
-                <label className="text-xs text-slate-400 block">Initial Milestones</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block">
+                  Initial Milestones
+                </label>
                 {initialMilestones.map((m, idx) => (
                   <div key={idx} className="flex gap-2">
                     <input
@@ -469,7 +490,7 @@ export function GoalsView() {
                         onClick={() =>
                           setInitialMilestones(initialMilestones.filter((_, i) => i !== idx))
                         }
-                        className="p-1 text-slate-500 hover:text-rose-400"
+                        className="p-1 text-[#74726A] hover:text-[#A33F17]"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -479,23 +500,23 @@ export function GoalsView() {
                 <button
                   type="button"
                   onClick={() => setInitialMilestones([...initialMilestones, ''])}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 mt-1"
+                  className="text-xs text-[#171614] hover:underline flex items-center gap-1 mt-1 cursor-pointer"
                 >
                   <Plus className="w-3 h-3" /> Add another milestone
                 </button>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E3D8]">
                 <button
                   type="button"
                   onClick={() => setIsGoalModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-mono-tabular text-[#74726A] hover:text-[#171614]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md"
+                  className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors"
                 >
                   Save Goal
                 </button>

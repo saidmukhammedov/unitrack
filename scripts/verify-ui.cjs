@@ -28,10 +28,11 @@ async function run() {
     });
 
     console.log('1. Navigating to http://localhost:5173 (Desktop)...');
-    await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1500);
 
     // Check if already authenticated or needs login
-    const isLoginFormVisible = await page.getByRole('button', { name: 'Sign In', exact: true }).isVisible();
+    const isLoginFormVisible = await page.locator('button[type="submit"]:has-text("Sign In")').isVisible();
 
     if (isLoginFormVisible) {
       console.log('Login form detected. Taking login screenshot...');
@@ -43,13 +44,12 @@ async function run() {
       await page.fill('input[type="email"]', 'prod-ui-verify@unitrack.test');
       await page.fill('input[type="password"]', 'Str0ng!Password123');
 
-      const submitBtn = page.getByRole('button', { name: 'Sign In', exact: true });
-      await submitBtn.click();
-      await page.waitForTimeout(1500);
+      await page.locator('button[type="submit"]:has-text("Sign In")').click();
+      await page.waitForTimeout(2000);
 
-      // Check if error box appeared (meaning user needs to register)
-      const errorBox = page.locator('div[class*="border-rose"]');
-      if (await errorBox.isVisible()) {
+      // Check if still on auth screen (e.g. user not registered yet)
+      const stillNeedsAuth = await page.locator('button[type="submit"]:has-text("Sign In")').isVisible();
+      if (stillNeedsAuth) {
         console.log('User not registered yet. Switching to Register view...');
         await page.click('button:has-text("Sign up now")');
         await page.waitForTimeout(500);
@@ -58,7 +58,7 @@ async function run() {
         await page.fill('input[type="email"]', 'prod-ui-verify@unitrack.test');
         await page.fill('input[type="password"]', 'Str0ng!Password123');
         await page.locator('button[type="submit"]').click();
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(2500);
       }
     } else {
       console.log('Session already active. Taking Chronicle view screenshot directly...');
@@ -113,28 +113,28 @@ async function run() {
     // 3. Navigation across all views
     // -------------------------------------------------------------------------
     console.log('7. Testing Navigation: Plan & Review...');
-    await page.click('button:has-text("Plan & Review")');
+    await page.locator('button:has-text("Plan & Review"), button:has-text("Retrospective")').first().click();
     await page.waitForSelector('text=Weekly Planning & Reflection', { timeout: 15000 });
     const reviewScreenshot = path.join(ARTIFACT_DIR, '04_desktop_review.png');
     await page.screenshot({ path: reviewScreenshot, fullPage: true });
     console.log(`Saved Review screenshot: ${reviewScreenshot}`);
 
     console.log('8. Testing Navigation: Goals...');
-    await page.click('button:has-text("Goals")');
+    await page.locator('button:has-text("Goals"), button:has-text("Horizons")').first().click();
     await page.waitForSelector('text=Goals & Key Milestones', { timeout: 15000 });
     const goalsScreenshot = path.join(ARTIFACT_DIR, '05_desktop_goals.png');
     await page.screenshot({ path: goalsScreenshot, fullPage: true });
     console.log(`Saved Goals screenshot: ${goalsScreenshot}`);
 
     console.log('9. Testing Navigation: Habits...');
-    await page.click('button:has-text("Habits")');
+    await page.locator('button:has-text("Habits"), button:has-text("Cadence")').first().click();
     await page.waitForSelector('text=Habits & Daily Cadence', { timeout: 15000 });
     const habitsScreenshot = path.join(ARTIFACT_DIR, '06_desktop_habits.png');
     await page.screenshot({ path: habitsScreenshot, fullPage: true });
     console.log(`Saved Habits screenshot: ${habitsScreenshot}`);
 
     console.log('10. Testing Navigation: Academic Hub...');
-    await page.click('button:has-text("Academic Hub")');
+    await page.locator('button:has-text("Academic Hub"), button:has-text("Scholarship")').first().click();
     await page.waitForSelector('text=Academic Suite', { timeout: 15000 });
     const academicScreenshot = path.join(ARTIFACT_DIR, '07_desktop_academic_hub.png');
     await page.screenshot({ path: academicScreenshot, fullPage: true });
@@ -144,9 +144,10 @@ async function run() {
     // 4. Persistence across Refresh
     // -------------------------------------------------------------------------
     console.log('11. Testing Refresh & Session Persistence...');
-    await page.click('button:has-text("Today")');
+    await page.locator('button:has-text("Today")').first().click();
     await page.waitForSelector("text=Today's Commitments", { timeout: 15000 });
-    await page.reload({ waitUntil: 'networkidle' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1000);
     await page.waitForSelector("text=Today's Commitments", { timeout: 15000 });
     console.log('Session and Today stream successfully persisted after full page reload!');
 
@@ -162,27 +163,35 @@ async function run() {
       hasTouch: true,
     });
     const mobilePage = await mobileContext.newPage();
-    await mobilePage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+    await mobilePage.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+    await mobilePage.waitForTimeout(1500);
 
     // Login on mobile context if needed
-    const isMobileLoggedIn = await mobilePage.locator("text=Today's Commitments").isVisible();
-    if (!isMobileLoggedIn) {
+    const isMobileLoginFormVisible = await mobilePage.locator('button[type="submit"]:has-text("Sign In")').isVisible();
+    if (isMobileLoginFormVisible) {
       await mobilePage.fill('input[type="email"]', 'prod-ui-verify@unitrack.test');
       await mobilePage.fill('input[type="password"]', 'Str0ng!Password123');
-      await mobilePage.getByRole('button', { name: 'Sign In', exact: true }).click();
-      await mobilePage.waitForSelector("text=Today's Commitments", { timeout: 15000 });
+      await mobilePage.locator('button[type="submit"]:has-text("Sign In")').click();
+      await mobilePage.waitForTimeout(2000);
     }
 
+    await mobilePage.waitForSelector("text=Today's Commitments", { timeout: 15000 });
     const mobileTodayScreenshot = path.join(ARTIFACT_DIR, '08_mobile_today_chronicle.png');
     await mobilePage.screenshot({ path: mobileTodayScreenshot, fullPage: true });
     console.log(`Saved Mobile Today screenshot: ${mobileTodayScreenshot}`);
 
-    // Mobile horizontal nav test
-    await mobilePage.locator('button:visible', { hasText: 'Goals' }).click();
+    // Open mobile menu
+    const menuToggle = mobilePage.locator('button[aria-label="Toggle Navigation Menu"]');
+    if (await menuToggle.isVisible()) {
+      await menuToggle.click();
+      await mobilePage.waitForTimeout(500);
+    }
+
+    // Mobile nav test to Horizons (Goals)
+    await mobilePage.locator('button:visible', { hasText: 'Goals' }).first().click();
     await mobilePage.waitForSelector('text=Goals & Key Milestones', { timeout: 15000 });
     const mobileGoalsScreenshot = path.join(ARTIFACT_DIR, '09_mobile_goals.png');
     await mobilePage.screenshot({ path: mobileGoalsScreenshot, fullPage: true });
-    console.log(`Saved Mobile Goals screenshot: ${mobileGoalsScreenshot}`);
     console.log(`Saved Mobile Goals screenshot: ${mobileGoalsScreenshot}`);
 
     await mobileContext.close();

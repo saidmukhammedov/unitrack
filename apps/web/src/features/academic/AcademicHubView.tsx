@@ -36,19 +36,24 @@ export function AcademicHubView({ initialSubTab = 'overview' }: AcademicHubViewP
   ] as const;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-16">
       {/* Sub-header navigation */}
-      <div className="border-b border-slate-800 pb-3 flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="font-serif-chronicle text-2xl text-slate-100 font-normal">
+      <div className="border-b border-[#E5E3D8] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-[11px] font-mono-tabular tracking-wider uppercase text-[#74726A]">
+            <span>Scholarship Archive</span>
+            <span className="text-[#D8D5C8]">•</span>
+            <span>Academic Suite</span>
+          </div>
+          <h1 className="font-serif-chronicle text-3xl sm:text-4xl text-[#171614] font-normal tracking-tight">
             Academic Suite
           </h1>
-          <p className="text-xs text-slate-400">
-            Timetables, course requirements, grading schemes, and exam schedules.
+          <p className="text-xs text-[#74726A]">
+            Timetables, course requirements, grading schemes, and examination milestones.
           </p>
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 flex-wrap">
+        <div className="flex items-center gap-1 bg-[#FBFBF9] p-1 rounded border border-[#E5E3D8] flex-wrap">
           {ACADEMIC_SUB_NAV.map((item) => {
             const Icon = item.icon;
             const isActive = subTab === item.key;
@@ -56,10 +61,10 @@ export function AcademicHubView({ initialSubTab = 'overview' }: AcademicHubViewP
               <button
                 key={item.key}
                 onClick={() => setSubTab(item.key)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs transition-all cursor-pointer font-medium ${
                   isActive
-                    ? 'bg-indigo-600 text-white font-semibold shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    ? 'bg-[#171614] text-[#FBFBF9]'
+                    : 'text-[#74726A] hover:text-[#171614] hover:bg-[#F4F3ED]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

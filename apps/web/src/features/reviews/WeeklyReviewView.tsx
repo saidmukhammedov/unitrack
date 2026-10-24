@@ -13,6 +13,7 @@ import {
   Plus,
   Trash2,
   TrendingUp,
+  Check,
 } from 'lucide-react';
 
 function getMondayOfCurrentWeek(): string {
@@ -115,43 +116,47 @@ export function WeeklyReviewView() {
   if (isLoading) {
     return (
       <div className="py-24 text-center">
-        <p className="font-serif-chronicle italic text-slate-400 text-lg">
-          Gathering weekly reflections...
+        <div className="w-6 h-6 border-2 border-[#171614] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="font-serif-chronicle italic text-[#74726A] text-lg">
+          Gathering weekly reflections & observations...
         </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-16">
-      {/* Header */}
-      <header className="border-b border-slate-800 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-slate-400 font-semibold mb-1">
-            <span>Plan & Review</span>
-            <span className="text-slate-600">•</span>
+    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+      {/* Editorial Header */}
+      <header className="border-b border-[#E5E3D8] pb-8 pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5 text-[11px] font-mono-tabular tracking-wider uppercase text-[#74726A]">
+            <span>Retrospective Ledger</span>
+            <span className="text-[#D8D5C8]">•</span>
             <span>Week {review?.weekNumber || 1}, {review?.year || 2026}</span>
           </div>
-          <h1 className="font-serif-chronicle text-3xl sm:text-4xl text-slate-100 font-normal tracking-tight">
+          <h1 className="font-serif-chronicle text-3xl sm:text-5xl text-[#171614] font-normal tracking-tight">
             Weekly Planning & Reflection
           </h1>
+          <p className="text-xs text-[#74726A] max-w-xl">
+            A sacred space for honest appraisal. Reconcile intended plans against reality, distill lessons, and set clear anchors for the week ahead.
+          </p>
         </div>
 
         {/* Week navigation */}
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1 shrink-0">
+        <div className="flex items-center gap-2 border border-[#E5E3D8] bg-[#FBFBF9] rounded p-1 shrink-0">
           <button
             onClick={handlePrevWeek}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#74726A] hover:text-[#171614] rounded hover:bg-[#F4F3ED] transition-colors cursor-pointer"
             title="Previous Week"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="font-mono-tabular text-xs text-slate-300 font-semibold px-2">
+          <span className="font-mono-tabular text-xs text-[#171614] font-semibold px-2">
             {review?.weekStart} — {review?.weekEnd}
           </span>
           <button
             onClick={handleNextWeek}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-[#74726A] hover:text-[#171614] rounded hover:bg-[#F4F3ED] transition-colors cursor-pointer"
             title="Next Week"
           >
             <ChevronRight className="w-4 h-4" />
@@ -160,33 +165,33 @@ export function WeeklyReviewView() {
       </header>
 
       {/* Actual Week Performance Metrics */}
-      <section className="grid grid-cols-3 gap-3">
-        <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-            <Clock className="w-3.5 h-3.5 text-indigo-400" />
+      <section className="grid grid-cols-3 gap-4 border border-[#E5E3D8] rounded p-4 bg-[#FBFBF9]">
+        <div className="text-center sm:text-left sm:pl-4">
+          <div className="flex items-center gap-1.5 text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A] mb-1">
+            <Clock className="w-3 h-3 text-[#171614]" />
             <span>Commitments Attended</span>
           </div>
-          <span className="font-mono-tabular text-2xl font-bold text-slate-100">
+          <span className="font-serif-chronicle text-2xl sm:text-3xl font-medium text-[#171614]">
             {review?.metrics.commitmentsAttended ?? 0}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="text-center sm:text-left sm:border-l border-[#E5E3D8] sm:pl-6">
+          <div className="flex items-center gap-1.5 text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A] mb-1">
+            <CheckCircle2 className="w-3 h-3 text-[#2C4839]" />
             <span>Tasks Completed</span>
           </div>
-          <span className="font-mono-tabular text-2xl font-bold text-slate-100">
+          <span className="font-serif-chronicle text-2xl sm:text-3xl font-medium text-[#2C4839]">
             {review?.metrics.tasksCompleted ?? 0}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-            <Flame className="w-3.5 h-3.5 text-amber-400" />
+        <div className="text-center sm:text-left sm:border-l border-[#E5E3D8] sm:pl-6">
+          <div className="flex items-center gap-1.5 text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A] mb-1">
+            <Flame className="w-3 h-3 text-[#A33F17]" />
             <span>Habits Logged</span>
           </div>
-          <span className="font-mono-tabular text-2xl font-bold text-slate-100">
+          <span className="font-serif-chronicle text-2xl sm:text-3xl font-medium text-[#A33F17]">
             {review?.metrics.habitCompletions ?? 0}
           </span>
         </div>
@@ -194,62 +199,62 @@ export function WeeklyReviewView() {
 
       {/* Reflection Prompts */}
       <section className="space-y-6">
-        <h2 className="font-serif-chronicle text-2xl text-slate-200 !text-2xl !font-normal border-b border-slate-800/80 pb-2">
+        <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal border-b border-[#E5E3D8] pb-2">
           Retrospective Reflections
         </h2>
 
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5 uppercase tracking-wider">
+        <div className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block">
               1. What went well this week?
             </label>
             <textarea
               rows={3}
-              placeholder="Key achievements, energizing moments, breakthroughs..."
+              placeholder="Key achievements, energizing moments, breakthroughs, commitments fulfilled..."
               value={whatWentWell}
               onChange={(e) => setWhatWentWell(e.target.value)}
-              className="w-full text-sm"
+              className="w-full text-sm leading-relaxed"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5 uppercase tracking-wider">
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block">
               2. What could be improved or simplified?
             </label>
             <textarea
               rows={3}
-              placeholder="Friction points, postponed tasks, distractions..."
+              placeholder="Friction points, postponed tasks, energy drains, systemic miscalculations..."
               value={whatToImprove}
               onChange={(e) => setWhatToImprove(e.target.value)}
-              className="w-full text-sm"
+              className="w-full text-sm leading-relaxed"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5 uppercase tracking-wider">
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block">
               3. Core takeaway or adjustment for next week
             </label>
             <textarea
               rows={2}
-              placeholder="One actionable insight to carry forward..."
+              placeholder="One actionable rule or standard to anchor your upcoming cycle..."
               value={keyTakeaways}
               onChange={(e) => setKeyTakeaways(e.target.value)}
-              className="w-full text-sm"
+              className="w-full text-sm leading-relaxed"
             />
           </div>
         </div>
       </section>
 
       {/* Next Week Intentions */}
-      <section className="space-y-4 pt-4 border-t border-slate-800/80">
-        <div className="flex items-center justify-between">
-          <h2 className="font-serif-chronicle text-2xl text-slate-200 !text-2xl !font-normal !mb-0">
+      <section className="space-y-4 pt-6 border-t border-[#E5E3D8]">
+        <div className="flex items-baseline justify-between">
+          <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal !mb-0">
             Intentions & Anchor Objectives
           </h2>
-          <span className="text-xs text-slate-500">Top priorities for next week</span>
+          <span className="text-xs font-mono-tabular text-[#74726A]">Priorities for next cycle</span>
         </div>
 
-        <form onSubmit={handleAddIntention} className="flex gap-2 !bg-transparent !border-0 !p-0 !shadow-none">
+        <form onSubmit={handleAddIntention} className="flex gap-2">
           <input
             type="text"
             placeholder="Add an anchor intention for next week..."
@@ -259,7 +264,7 @@ export function WeeklyReviewView() {
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shrink-0"
+            className="px-4 py-2 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] rounded text-xs font-medium flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add</span>
@@ -267,24 +272,26 @@ export function WeeklyReviewView() {
         </form>
 
         {intentions.length === 0 ? (
-          <p className="text-xs text-slate-500 italic">No intentions set yet for this week.</p>
+          <p className="text-xs text-[#74726A] font-serif-chronicle italic">
+            No intentions registered for next week yet. Anchor your focus with 1 to 3 core goals.
+          </p>
         ) : (
-          <div className="space-y-2">
+          <div className="divide-y divide-[#E5E3D8] border border-[#E5E3D8] rounded bg-[#FBFBF9]">
             {intentions.map((intent, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-3"
+                className="p-3.5 flex items-center justify-between gap-3 hover:bg-[#F4F3ED]/40 transition-colors"
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="font-mono-tabular text-xs font-bold text-indigo-400">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono-tabular text-xs font-bold text-[#A33F17]">
                     0{idx + 1}
                   </span>
-                  <span className="text-sm text-slate-200">{intent}</span>
+                  <span className="text-sm text-[#171614]">{intent}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleRemoveIntention(idx)}
-                  className="p-1 text-slate-500 hover:text-rose-400 transition-colors"
+                  className="p-1 text-[#74726A] hover:text-[#A33F17] transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -295,23 +302,23 @@ export function WeeklyReviewView() {
       </section>
 
       {/* Save bar */}
-      <div className="pt-6 border-t border-slate-800 flex items-center justify-between">
+      <div className="pt-6 border-t border-[#E5E3D8] flex items-center justify-between">
         {saveSuccess ? (
-          <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4" /> Weekly review saved successfully!
+          <span className="text-xs font-semibold text-[#2C4839] flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4" /> Retrospective saved to the archive!
           </span>
         ) : (
-          <span className="text-xs text-slate-500">
-            Reviews capture retrospective performance and anchor focus.
+          <span className="text-xs text-[#74726A]">
+            Reviews form your permanent personal history and inform the daily rhythm.
           </span>
         )}
 
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-6 py-2 bg-[#171614] hover:bg-[#2C2B27] text-[#FBFBF9] font-medium text-xs rounded transition-colors cursor-pointer disabled:opacity-50"
         >
-          <Save className="w-4 h-4" />
+          <Save className="w-3.5 h-3.5" />
           <span>{isSaving ? 'Saving...' : 'Save Review'}</span>
         </button>
       </div>

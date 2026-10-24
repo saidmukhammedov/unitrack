@@ -27,6 +27,8 @@ import {
   Tag,
   CalendarDays,
   Target,
+  CornerDownRight,
+  MapPin,
 } from 'lucide-react';
 
 interface TodayViewProps {
@@ -55,6 +57,7 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
   const [newCommitmentTitle, setNewCommitmentTitle] = useState('');
   const [newCommitmentStartTime, setNewCommitmentStartTime] = useState('09:00');
   const [newCommitmentEndTime, setNewCommitmentEndTime] = useState('10:00');
+  const [newCommitmentLocation, setNewCommitmentLocation] = useState('');
   const [newCommitmentContextId, setNewCommitmentContextId] = useState<string>('');
 
   const [newHabitTitle, setNewHabitTitle] = useState('');
@@ -296,9 +299,11 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
         specificDate: todayDate,
         startTime: newCommitmentStartTime,
         endTime: newCommitmentEndTime,
+        location: newCommitmentLocation.trim() || undefined,
         contextId: newCommitmentContextId || undefined,
       });
       setNewCommitmentTitle('');
+      setNewCommitmentLocation('');
       setIsCommitmentModalOpen(false);
       await loadTodayData();
     } catch (err: any) {
@@ -326,10 +331,10 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <div className="w-8 h-8 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
-        <p className="font-serif-chronicle italic text-slate-400 text-lg">
-          Composing today's chronicle...
+      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-6 h-6 border-2 border-[#171614] border-t-transparent rounded-full animate-spin" />
+        <p className="font-serif-chronicle italic text-[#74726A] text-lg">
+          Inscribing today's chronicle...
         </p>
       </div>
     );
@@ -337,15 +342,15 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
 
   if (error || !data) {
     return (
-      <div className="py-12 text-center max-w-md mx-auto">
-        <AlertCircle className="w-10 h-10 text-rose-400 mx-auto mb-3" />
-        <h3 className="text-lg font-bold text-slate-200">Could not load Today view</h3>
-        <p className="text-sm text-slate-400 mt-1 mb-4">{error}</p>
+      <div className="py-16 text-center max-w-md mx-auto paper-panel">
+        <AlertCircle className="w-8 h-8 text-[#A33F17] mx-auto mb-3" />
+        <h3 className="font-serif-chronicle text-xl text-[#171614]">Chronicle Unavailable</h3>
+        <p className="text-xs text-[#74726A] mt-1 mb-5">{error}</p>
         <button
           onClick={loadTodayData}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold text-white transition-colors"
+          className="px-4 py-2 bg-[#171614] hover:bg-[#2C2B27] rounded text-xs font-medium text-[#FBFBF9] transition-colors"
         >
-          Try Again
+          Re-open Ledger
         </button>
       </div>
     );
@@ -386,31 +391,34 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
   const completedHabitsCount = habits.filter((h) => h.status === 'COMPLETED').length;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-16">
+    <div className="max-w-5xl mx-auto space-y-10 pb-20">
       {/* 1. The Chronicle Editorial Header */}
-      <header className="border-b border-slate-800 pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-slate-400 font-semibold mb-1">
+      <header className="border-b border-[#E5E3D8] pb-8 pt-2">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2.5 text-[11px] font-mono-tabular tracking-wider uppercase text-[#74726A]">
               <span>{dayName}</span>
-              <span className="text-slate-600">•</span>
+              <span className="text-[#D8D5C8]">•</span>
               <span>{monthName} {dayNum}, {year}</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-indigo-400">The Chronicle</span>
+              <span className="text-[#D8D5C8]">•</span>
+              <span className="text-[#A33F17] font-semibold">Chrono-Stream</span>
             </div>
-            <h1 className="font-serif-chronicle text-3xl sm:text-4xl text-slate-100 font-normal tracking-tight">
+            <h1 className="font-serif-chronicle text-3xl sm:text-5xl text-[#171614] font-normal tracking-tight">
               Focus, Commitments & Daily Rhythm
             </h1>
           </div>
 
-          {/* Quick Context Pills */}
+          {/* Quick Context Filter */}
           <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-mono-tabular uppercase tracking-wider text-[#74726A] mr-1">
+              Filter:
+            </span>
             <button
               onClick={() => setSelectedContextId(null)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              className={`px-3 py-1 text-xs rounded transition-all cursor-pointer ${
                 selectedContextId === null
-                  ? 'bg-slate-200 text-slate-900 font-semibold'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 border border-slate-800'
+                  ? 'bg-[#171614] text-[#FBFBF9] font-medium shadow-xs'
+                  : 'text-[#74726A] hover:text-[#171614] hover:bg-[#F4F3ED] border border-[#E5E3D8]'
               }`}
             >
               All
@@ -421,14 +429,14 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                 <button
                   key={ctx.id}
                   onClick={() => setSelectedContextId(isSelected ? null : ctx.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all border ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs rounded transition-all border cursor-pointer ${
                     isSelected
-                      ? 'bg-slate-800 text-white border-slate-600 shadow-sm'
-                      : 'bg-slate-900/60 text-slate-400 hover:text-slate-200 border-slate-800/80'
+                      ? 'bg-[#171614] text-[#FBFBF9] border-[#171614] font-medium shadow-xs'
+                      : 'text-[#74726A] hover:text-[#171614] hover:bg-[#F4F3ED] border-[#E5E3D8]'
                   }`}
                 >
                   <span
-                    className="w-2 h-2 rounded-full"
+                    className="w-1.5 h-1.5 rounded-full"
                     style={{ backgroundColor: ctx.colorHex }}
                   />
                   <span>{ctx.name}</span>
@@ -440,35 +448,77 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
 
         {/* Top Intentions / Anchor Priorities */}
         {data.topIntentions.length > 0 && (
-          <div className="mt-5 p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 flex items-start gap-3">
-            <div className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-              <Sparkles className="w-3 h-3" />
+          <div className="mt-6 p-4 rounded bg-[#F4F3ED] border-l-2 border-[#A33F17] border-y border-r border-[#E5E3D8] flex items-start gap-3">
+            <div className="text-[#A33F17] shrink-0 mt-0.5">
+              <Sparkles className="w-4 h-4" />
             </div>
-            <div className="flex-1 text-xs">
-              <span className="font-semibold text-slate-300 mr-2 uppercase tracking-wider text-[11px]">
+            <div className="flex-1 text-xs leading-relaxed">
+              <span className="font-mono-tabular uppercase tracking-wider text-[11px] font-semibold text-[#171614] mr-2">
                 Today's Anchors:
               </span>
-              <span className="text-slate-400">
-                {data.topIntentions.join('  •  ')}
+              <span className="text-[#2C2B27] font-serif-chronicle italic text-sm">
+                {data.topIntentions.join('  —  ')}
               </span>
             </div>
           </div>
         )}
       </header>
 
-      {/* 2. Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column (Commitments Timeline & Habits) - 7 cols */}
-        <div className="lg:col-span-7 space-y-8">
-          {/* Commitments & Agenda */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-indigo-400" />
-                <h2 className="font-serif-chronicle text-xl text-slate-200 font-normal !mb-0 !text-xl">
+      {/* 2. Top Rhythm Ledger Bar */}
+      <section className="grid grid-cols-3 gap-4 border border-[#E5E3D8] rounded p-4 bg-[#FBFBF9]">
+        <div className="text-center sm:text-left sm:pl-4">
+          <span className="text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A] block">
+            Attended Agenda
+          </span>
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <span className="font-serif-chronicle text-2xl sm:text-3xl font-medium text-[#171614]">
+              {attendedCommitmentsCount}
+            </span>
+            <span className="text-xs text-[#74726A] font-mono-tabular">
+              / {commitments.length}
+            </span>
+          </div>
+        </div>
+        <div className="text-center sm:text-left sm:border-l border-[#E5E3D8] sm:pl-6">
+          <span className="text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A] block">
+            Tasks Resolved
+          </span>
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <span className="font-serif-chronicle text-2xl sm:text-3xl font-medium text-[#2C4839]">
+              {completedTasksCount}
+            </span>
+            <span className="text-xs text-[#74726A] font-mono-tabular">
+              / {tasks.length}
+            </span>
+          </div>
+        </div>
+        <div className="text-center sm:text-left sm:border-l border-[#E5E3D8] sm:pl-6">
+          <span className="text-[10px] font-mono-tabular uppercase tracking-wider text-[#74726A] block">
+            Habit Rituals
+          </span>
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <span className="font-serif-chronicle text-2xl sm:text-3xl font-medium text-[#A33F17]">
+              {completedHabitsCount}
+            </span>
+            <span className="text-xs text-[#74726A] font-mono-tabular">
+              / {habits.length}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Main Chronicle Stream & Ledger */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* Left Column: Commitments Timeline & Daily Cadence (7 cols) */}
+        <div className="lg:col-span-7 space-y-10">
+          {/* Commitments & Agenda Section */}
+          <section className="space-y-4">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-2">
+              <div className="flex items-baseline gap-2.5">
+                <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal !mb-0">
                   Today's Commitments
                 </h2>
-                <span className="text-xs text-slate-500 font-mono-tabular">
+                <span className="text-xs text-[#74726A] font-mono-tabular">
                   ({filteredCommitments.length})
                 </span>
               </div>
@@ -476,7 +526,7 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowCancelled(!showCancelled)}
-                  className="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-colors px-2 py-1 rounded bg-slate-900 border border-slate-800"
+                  className="text-[11px] font-mono-tabular text-[#74726A] hover:text-[#171614] flex items-center gap-1.5 transition-colors px-2 py-1 rounded border border-[#E5E3D8] bg-[#FBFBF9]"
                   title="Toggle cancelled occurrences"
                 >
                   {showCancelled ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
@@ -485,7 +535,7 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
 
                 <button
                   onClick={() => setIsCommitmentModalOpen(true)}
-                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition-colors"
+                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded bg-[#171614] text-[#FBFBF9] hover:bg-[#2C2B27] transition-colors cursor-pointer"
                 >
                   <Plus className="w-3 h-3" />
                   <span>Commitment</span>
@@ -494,11 +544,14 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
             </div>
 
             {filteredCommitments.length === 0 ? (
-              <div className="py-8 text-center border border-dashed border-slate-800/80 rounded-xl bg-slate-950/40">
-                <p className="text-xs text-slate-500">No scheduled commitments for today.</p>
+              <div className="py-12 text-center border border-dashed border-[#E5E3D8] rounded bg-[#F4F3ED]/40">
+                <Clock className="w-6 h-6 text-[#74726A] mx-auto mb-2 opacity-50" />
+                <p className="text-xs text-[#74726A] font-serif-chronicle italic text-sm">
+                  No scheduled commitments for today. Free flow of time.
+                </p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="divide-y divide-[#E5E3D8] border-y border-[#E5E3D8]">
                 {filteredCommitments.map((c) => {
                   const isCancelled = c.status === 'CANCELLED';
                   const isAttended = c.status === 'ATTENDED';
@@ -506,35 +559,37 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                   return (
                     <div
                       key={c.id}
-                      className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                      className={`py-3.5 px-2 flex items-center justify-between gap-4 transition-colors ${
                         isCancelled
-                          ? 'bg-slate-950/40 border-slate-800/40 opacity-60'
+                          ? 'opacity-40 bg-[#F4F3ED]/30'
                           : isAttended
-                          ? 'bg-slate-900/30 border-emerald-900/30'
-                          : 'bg-slate-900/70 border-slate-800/80 hover:border-slate-700'
+                          ? 'bg-[#2C4839]/5'
+                          : 'hover:bg-[#F4F3ED]/40'
                       }`}
                     >
                       {/* Time & Title */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="font-mono-tabular text-xs font-semibold text-slate-300 w-24 shrink-0">
-                          {c.startTime} – {c.endTime}
+                      <div className="flex items-baseline gap-4 min-w-0">
+                        <div className="font-mono-tabular text-xs font-semibold text-[#171614] w-24 shrink-0 tracking-tight">
+                          {c.startTime} — {c.endTime}
                         </div>
 
-                        <div className="min-w-0">
+                        <div className="min-w-0 space-y-0.5">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`text-sm font-medium truncate ${
-                                isCancelled ? 'line-through text-slate-500' : 'text-slate-100'
+                              className={`text-sm font-medium ${
+                                isCancelled
+                                  ? 'line-through text-[#74726A]'
+                                  : 'text-[#171614]'
                               }`}
                             >
                               {c.title}
                             </span>
                             {c.contextName && (
                               <span
-                                className="px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0"
+                                className="px-1.5 py-0.2 rounded text-[10px] font-mono-tabular border"
                                 style={{
-                                  backgroundColor: `${c.contextColor || '#6366f1'}20`,
-                                  color: c.contextColor || '#818cf8',
+                                  borderColor: `${c.contextColor || '#171614'}40`,
+                                  color: c.contextColor || '#171614',
                                 }}
                               >
                                 {c.contextName}
@@ -542,49 +597,53 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                             )}
                           </div>
                           {c.location && (
-                            <span className="text-[11px] text-slate-400 block truncate">
-                              📍 {c.location}
+                            <span className="text-[11px] text-[#74726A] flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-[#A33F17]" />
+                              <span>{c.location}</span>
                             </span>
                           )}
                         </div>
                       </div>
 
                       {/* Action buttons */}
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         {c.source === 'UNIVERSAL' && (
                           <>
                             {isAttended ? (
-                              <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <span className="text-[11px] font-mono-tabular font-semibold text-[#2C4839] bg-[#2C4839]/10 border border-[#2C4839]/20 px-2.5 py-0.5 rounded flex items-center gap-1">
                                 <Check className="w-3 h-3" /> Attended
                               </span>
                             ) : isCancelled ? (
-                              <span className="text-[11px] text-slate-500 italic">Cancelled</span>
+                              <span className="text-[11px] font-serif-chronicle italic text-[#74726A]">
+                                Cancelled
+                              </span>
                             ) : (
-                              <>
+                              <div className="flex items-center gap-1.5">
                                 <button
                                   onClick={() => handleLogCommitment(c, 'ATTENDED')}
-                                  className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-emerald-950/30 rounded-lg transition-colors"
+                                  className="text-xs px-2.5 py-1 font-medium bg-[#F4F3ED] hover:bg-[#E5E3D8] text-[#171614] border border-[#D8D5C8] rounded transition-colors cursor-pointer flex items-center gap-1"
                                   title="Mark as Attended"
                                 >
-                                  <Check className="w-4 h-4" />
+                                  <Check className="w-3 h-3 text-[#2C4839]" />
+                                  <span>Attend</span>
                                 </button>
                                 <button
                                   onClick={() => handleLogCommitment(c, 'CANCELLED')}
-                                  className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors"
+                                  className="text-[11px] font-mono-tabular text-[#74726A] hover:text-[#A33F17] p-1 transition-colors"
                                   title="Cancel for today"
                                 >
-                                  <X className="w-4 h-4" />
+                                  <X className="w-3.5 h-3.5" />
                                 </button>
-                              </>
+                              </div>
                             )}
                           </>
                         )}
                         {c.source === 'ACADEMIC' && onNavigateToAcademic && (
                           <button
                             onClick={() => onNavigateToAcademic('timetable')}
-                            className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium px-2 py-1"
+                            className="text-xs font-mono-tabular text-[#1E2D42] hover:underline"
                           >
-                            Academic Class
+                            Academic Class →
                           </button>
                         )}
                       </div>
@@ -595,22 +654,21 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
             )}
           </section>
 
-          {/* Habits & Daily Routines */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-amber-500" />
-                <h2 className="font-serif-chronicle text-xl text-slate-200 font-normal !mb-0 !text-xl">
+          {/* Habits & Daily Rhythm Section */}
+          <section className="space-y-4">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-2">
+              <div className="flex items-baseline gap-2.5">
+                <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal !mb-0">
                   Daily Habits & Rhythm
                 </h2>
-                <span className="text-xs text-slate-500 font-mono-tabular">
+                <span className="text-xs text-[#74726A] font-mono-tabular">
                   ({filteredHabits.length})
                 </span>
               </div>
 
               <button
                 onClick={() => setIsHabitModalOpen(true)}
-                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 transition-colors"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded border border-[#E5E3D8] hover:border-[#171614] text-[#171614] bg-[#FBFBF9] transition-colors cursor-pointer"
               >
                 <Plus className="w-3 h-3" />
                 <span>Habit</span>
@@ -618,8 +676,11 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
             </div>
 
             {filteredHabits.length === 0 ? (
-              <div className="py-8 text-center border border-dashed border-slate-800/80 rounded-xl bg-slate-950/40">
-                <p className="text-xs text-slate-500">No active habits. Create one to build consistency.</p>
+              <div className="py-12 text-center border border-dashed border-[#E5E3D8] rounded bg-[#F4F3ED]/40">
+                <Flame className="w-6 h-6 text-[#74726A] mx-auto mb-2 opacity-50" />
+                <p className="text-xs text-[#74726A] font-serif-chronicle italic text-sm">
+                  No active rituals registered. Create a habit to anchor your day.
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -631,53 +692,53 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                   return (
                     <div
                       key={h.id}
-                      className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
+                      className={`p-3.5 rounded border transition-all flex flex-col justify-between ${
                         isDone
-                          ? 'bg-amber-950/15 border-amber-500/30'
+                          ? 'bg-[#2C4839]/5 border-[#2C4839]/30'
                           : isSkipped
-                          ? 'bg-slate-950/40 border-slate-800/50 opacity-60'
-                          : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+                          ? 'bg-[#F4F3ED] border-[#E5E3D8] opacity-60'
+                          : 'bg-[#FBFBF9] border-[#E5E3D8] hover:border-[#D8D5C8]'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <div>
+                        <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-slate-100">
+                            <span className="text-sm font-medium text-[#171614]">
                               {h.title}
                             </span>
                             {h.contextName && (
                               <span
-                                className="w-2 h-2 rounded-full"
-                                style={{ backgroundColor: h.contextColor || '#6366f1' }}
+                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                style={{ backgroundColor: h.contextColor || '#171614' }}
                                 title={h.contextName}
                               />
                             )}
                           </div>
-                          <span className="text-[11px] text-slate-400">
-                            {h.frequencyType === 'DAILY' && 'Every day'}
+                          <span className="text-[11px] font-mono-tabular text-[#74726A] block">
+                            {h.frequencyType === 'DAILY' && 'Daily cadence'}
                             {h.frequencyType === 'SELECTED_WEEKDAYS' && 'Scheduled days'}
                             {h.frequencyType === 'WEEKLY_TARGET' && `${h.targetPerWeek}x per week`}
                           </span>
                         </div>
 
                         {/* Streak Badge */}
-                        <div className="flex items-center gap-1 text-xs font-mono-tabular font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                          <Flame className="w-3 h-3 text-amber-500" />
+                        <div className="flex items-center gap-1 text-xs font-mono-tabular font-semibold text-[#A33F17] bg-[#A33F17]/10 px-2 py-0.5 rounded border border-[#A33F17]/20">
+                          <Flame className="w-3 h-3 text-[#A33F17]" />
                           <span>{h.currentStreak}</span>
                         </div>
                       </div>
 
                       {/* Action Row */}
-                      <div className="mt-3 pt-2.5 border-t border-slate-800/60 flex items-center justify-between">
-                        <span className="text-[11px] font-medium text-slate-400">
-                          {isDone ? 'Completed' : isSkipped ? 'Skipped' : 'Pending'}
+                      <div className="mt-4 pt-2.5 border-t border-[#E5E3D8] flex items-center justify-between">
+                        <span className="text-[11px] font-mono-tabular text-[#74726A]">
+                          {isDone ? '✓ Completed' : isSkipped ? '— Skipped' : 'Pending'}
                         </span>
 
                         <div className="flex items-center gap-1.5">
                           {isDone ? (
                             <button
                               onClick={() => handleLogHabit(h.id, 'SKIPPED')}
-                              className="text-[10px] text-slate-400 hover:text-slate-200 px-2 py-0.5"
+                              className="text-[10px] font-mono-tabular text-[#74726A] hover:text-[#171614] px-1.5 py-0.5"
                             >
                               Edit
                             </button>
@@ -685,16 +746,16 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                             <>
                               <button
                                 onClick={() => handleLogHabit(h.id, 'SKIPPED')}
-                                className="text-[11px] text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded hover:bg-slate-800 transition-colors"
+                                className="text-[11px] font-mono-tabular text-[#74726A] hover:text-[#171614] px-2 py-0.5 transition-colors"
                                 title="Skip today (streak protected)"
                               >
                                 Skip
                               </button>
                               <button
                                 onClick={() => handleLogHabit(h.id, 'COMPLETED')}
-                                className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-500 hover:bg-amber-400 text-slate-950 transition-colors"
+                                className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded bg-[#171614] text-[#FBFBF9] hover:bg-[#2C2B27] transition-colors cursor-pointer"
                               >
-                                <Check className="w-3.5 h-3.5" />
+                                <Check className="w-3 h-3" />
                                 <span>Done</span>
                               </button>
                             </>
@@ -709,24 +770,22 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
           </section>
         </div>
 
-        {/* Right Column (Prioritized Tasks & Day Closeout) - 5 cols */}
-        <div className="lg:col-span-5 space-y-8">
-          {/* Prioritized Tasks */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <h2 className="font-serif-chronicle text-xl text-slate-200 font-normal !mb-0 !text-xl">
+        {/* Right Column: Actions Ledger (Tasks & Actions) (5 cols) */}
+        <div className="lg:col-span-5 space-y-10">
+          <section className="space-y-4">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-2">
+              <div className="flex items-baseline gap-2.5">
+                <h2 className="font-serif-chronicle text-2xl text-[#171614] font-normal !mb-0">
                   Tasks & Actions
                 </h2>
-                <span className="text-xs text-slate-500 font-mono-tabular">
+                <span className="text-xs text-[#74726A] font-mono-tabular">
                   ({filteredTasks.length})
                 </span>
               </div>
 
               <button
                 onClick={() => setIsTaskModalOpen(true)}
-                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 transition-colors"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded bg-[#171614] text-[#FBFBF9] hover:bg-[#2C2B27] transition-colors cursor-pointer"
               >
                 <Plus className="w-3 h-3" />
                 <span>Task</span>
@@ -734,70 +793,76 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
             </div>
 
             {filteredTasks.length === 0 ? (
-              <div className="py-8 text-center border border-dashed border-slate-800/80 rounded-xl bg-slate-950/40">
-                <p className="text-xs text-slate-500">All tasks completed or none due today.</p>
+              <div className="py-12 text-center border border-dashed border-[#E5E3D8] rounded bg-[#F4F3ED]/40">
+                <CheckCircle2 className="w-6 h-6 text-[#74726A] mx-auto mb-2 opacity-50" />
+                <p className="text-xs text-[#74726A] font-serif-chronicle italic text-sm">
+                  Ledger clear. All intentions fulfilled or none due today.
+                </p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="divide-y divide-[#E5E3D8] border-y border-[#E5E3D8]">
                 {filteredTasks.map((t) => {
-                  const priorityColors: Record<string, string> = {
-                    URGENT: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
-                    HIGH: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
-                    MEDIUM: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-                    LOW: 'text-slate-400 bg-slate-800 border-slate-700',
+                  const priorityStyles: Record<string, string> = {
+                    URGENT: 'text-[#A33F17] border-[#A33F17]/30 bg-[#A33F17]/10',
+                    HIGH: 'text-[#B45309] border-[#B45309]/30 bg-[#B45309]/10',
+                    MEDIUM: 'text-[#1E2D42] border-[#1E2D42]/30 bg-[#1E2D42]/10',
+                    LOW: 'text-[#74726A] border-[#D8D5C8] bg-[#F4F3ED]',
                   };
 
                   return (
                     <div
                       key={t.id}
-                      className={`p-3 rounded-xl border transition-all flex items-start gap-3 ${
+                      className={`py-3 px-2 flex items-start gap-3 transition-colors ${
                         t.isCompleted
-                          ? 'bg-slate-950/30 border-slate-800/40 opacity-50'
-                          : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
+                          ? 'opacity-40 bg-[#F4F3ED]/30'
+                          : 'hover:bg-[#F4F3ED]/40'
                       }`}
                     >
                       <button
                         onClick={() => handleToggleTask(t)}
-                        className={`mt-0.5 rounded cursor-pointer transition-colors ${
-                          t.isCompleted ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'
-                        }`}
+                        className="mt-0.5 text-[#171614] cursor-pointer"
+                        title={t.isCompleted ? 'Mark pending' : 'Mark complete'}
                       >
                         {t.isCompleted ? (
-                          <CheckCircle2 className="w-5 h-5" />
+                          <div className="w-4 h-4 rounded-xs border border-[#2C4839] bg-[#2C4839] text-[#FBFBF9] flex items-center justify-center">
+                            <Check className="w-3 h-3" />
+                          </div>
                         ) : (
-                          <Circle className="w-5 h-5" />
+                          <div className="w-4 h-4 rounded-xs border border-[#74726A] hover:border-[#171614] bg-[#FBFBF9]" />
                         )}
                       </button>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 space-y-1">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`text-sm font-medium ${
-                              t.isCompleted ? 'line-through text-slate-500' : 'text-slate-100'
+                            className={`text-sm ${
+                              t.isCompleted
+                                ? 'line-through text-[#74726A]'
+                                : 'text-[#171614] font-medium'
                             }`}
                           >
                             {t.title}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
-                              priorityColors[t.priority] || priorityColors.MEDIUM
+                            className={`px-1.5 py-0.2 rounded text-[10px] font-mono-tabular uppercase tracking-wider border ${
+                              priorityStyles[t.priority] || priorityStyles.MEDIUM
                             }`}
                           >
                             {t.priority}
                           </span>
 
                           {t.contextName && (
-                            <span className="text-[10px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] font-mono-tabular text-[#74726A] bg-[#F4F3ED] px-1.5 py-0.2 rounded border border-[#E5E3D8]">
                               {t.contextName}
                             </span>
                           )}
 
                           {t.postponedCount > 0 && (
-                            <span className="text-[10px] text-amber-400/80">
-                              Postponed {t.postponedCount}x
+                            <span className="text-[10px] font-mono-tabular text-[#A33F17]">
+                              Postponed {t.postponedCount}×
                             </span>
                           )}
                         </div>
@@ -806,8 +871,8 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                       {!t.isCompleted && (
                         <button
                           onClick={() => handlePostponeTask(t)}
-                          className="p-1 text-slate-500 hover:text-amber-400 rounded transition-colors"
-                          title="Postpone"
+                          className="p-1 text-[#74726A] hover:text-[#A33F17] transition-colors"
+                          title="Postpone to tomorrow"
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
                         </button>
@@ -819,70 +884,58 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
             )}
           </section>
 
-          {/* Day Closeout / Progress Overview */}
-          <section className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-3">
-            <h3 className="font-serif-chronicle text-lg text-slate-200 !text-lg !font-normal">
-              Today's Rhythm Summary
-            </h3>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="font-mono-tabular text-lg font-bold text-indigo-400 block">
-                  {attendedCommitmentsCount}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-slate-400">
-                  Attended
-                </span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="font-mono-tabular text-lg font-bold text-emerald-400 block">
-                  {completedTasksCount}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-slate-400">
-                  Tasks Done
-                </span>
-              </div>
-              <div className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <span className="font-mono-tabular text-lg font-bold text-amber-400 block">
-                  {completedHabitsCount}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-slate-400">
-                  Habits
-                </span>
-              </div>
-            </div>
-          </section>
+          {/* Quiet Retrospective Invitation */}
+          <div className="p-5 rounded border border-[#E5E3D8] bg-[#F4F3ED] space-y-2">
+            <span className="text-[10px] font-mono-tabular uppercase tracking-wider text-[#A33F17] font-semibold block">
+              Editorial Notice
+            </span>
+            <p className="font-serif-chronicle text-sm text-[#171614] leading-relaxed">
+              "The discipline of tracking is not merely about output, but clarity of purpose."
+            </p>
+            <p className="text-xs text-[#74726A]">
+              Review your full weekly trajectory anytime in the <span className="font-semibold text-[#171614]">Retrospective</span> ledger.
+            </p>
+          </div>
         </div>
       </div>
 
       {/* MODAL: Add Task */}
       {isTaskModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif-chronicle text-xl text-slate-100">Add Task</h3>
-              <button onClick={() => setIsTaskModalOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-[#171614]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FBFBF9] border border-[#D8D5C8] rounded shadow-xl max-w-md w-full p-6 space-y-5">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-3">
+              <h3 className="font-serif-chronicle text-2xl text-[#171614]">Add Task</h3>
+              <button
+                onClick={() => setIsTaskModalOpen(false)}
+                className="text-[#74726A] hover:text-[#171614]"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateTask} className="space-y-4 !bg-transparent !border-0 !shadow-none !p-0">
+            <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Title</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Title
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="Task title..."
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
-                  className="w-full"
+                  className="w-full text-sm"
+                  autoFocus
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Priority</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Priority
+                  </label>
                   <select
                     value={newTaskPriority}
                     onChange={(e: any) => setNewTaskPriority(e.target.value)}
-                    className="w-full"
+                    className="w-full text-xs font-mono-tabular"
                   >
                     <option value="LOW">Low</option>
                     <option value="MEDIUM">Medium</option>
@@ -891,11 +944,13 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Context</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Context
+                  </label>
                   <select
                     value={newTaskContextId}
                     onChange={(e) => setNewTaskContextId(e.target.value)}
-                    className="w-full"
+                    className="w-full text-xs"
                   >
                     <option value="">(None)</option>
                     {contexts.map((c) => (
@@ -906,17 +961,17 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E3D8]">
                 <button
                   type="button"
                   onClick={() => setIsTaskModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-mono-tabular text-[#74726A] hover:text-[#171614]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg"
+                  className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors"
                 >
                   Save Task
                 </button>
@@ -928,54 +983,78 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
 
       {/* MODAL: Add Commitment */}
       {isCommitmentModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif-chronicle text-xl text-slate-100">Add Commitment</h3>
-              <button onClick={() => setIsCommitmentModalOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-[#171614]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FBFBF9] border border-[#D8D5C8] rounded shadow-xl max-w-md w-full p-6 space-y-5">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-3">
+              <h3 className="font-serif-chronicle text-2xl text-[#171614]">Add Commitment</h3>
+              <button
+                onClick={() => setIsCommitmentModalOpen(false)}
+                className="text-[#74726A] hover:text-[#171614]"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateCommitment} className="space-y-4 !bg-transparent !border-0 !shadow-none !p-0">
+            <form onSubmit={handleCreateCommitment} className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Title</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Title
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="Focus Block, Meeting, etc..."
+                  placeholder="Focus Block, Seminar, Discussion..."
                   value={newCommitmentTitle}
                   onChange={(e) => setNewCommitmentTitle(e.target.value)}
-                  className="w-full"
+                  className="w-full text-sm"
+                  autoFocus
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Start Time (HH:MM)</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Start (HH:MM)
+                  </label>
                   <input
                     type="time"
                     required
                     value={newCommitmentStartTime}
                     onChange={(e) => setNewCommitmentStartTime(e.target.value)}
-                    className="w-full"
+                    className="w-full text-xs font-mono-tabular"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">End Time (HH:MM)</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    End (HH:MM)
+                  </label>
                   <input
                     type="time"
                     required
                     value={newCommitmentEndTime}
                     onChange={(e) => setNewCommitmentEndTime(e.target.value)}
-                    className="w-full"
+                    className="w-full text-xs font-mono-tabular"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Context</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Location (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Library, Studio, Office..."
+                  value={newCommitmentLocation}
+                  onChange={(e) => setNewCommitmentLocation(e.target.value)}
+                  className="w-full text-xs"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Context
+                </label>
                 <select
                   value={newCommitmentContextId}
                   onChange={(e) => setNewCommitmentContextId(e.target.value)}
-                  className="w-full"
+                  className="w-full text-xs"
                 >
                   <option value="">(None)</option>
                   {contexts.map((c) => (
@@ -985,17 +1064,17 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                   ))}
                 </select>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E3D8]">
                 <button
                   type="button"
                   onClick={() => setIsCommitmentModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-mono-tabular text-[#74726A] hover:text-[#171614]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg"
+                  className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors"
                 >
                   Save Commitment
                 </button>
@@ -1007,44 +1086,54 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
 
       {/* MODAL: Add Habit */}
       {isHabitModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif-chronicle text-xl text-slate-100">New Habit</h3>
-              <button onClick={() => setIsHabitModalOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-[#171614]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FBFBF9] border border-[#D8D5C8] rounded shadow-xl max-w-md w-full p-6 space-y-5">
+            <div className="flex items-baseline justify-between border-b border-[#E5E3D8] pb-3">
+              <h3 className="font-serif-chronicle text-2xl text-[#171614]">New Habit</h3>
+              <button
+                onClick={() => setIsHabitModalOpen(false)}
+                className="text-[#74726A] hover:text-[#171614]"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateHabit} className="space-y-4 !bg-transparent !border-0 !shadow-none !p-0">
+            <form onSubmit={handleCreateHabit} className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Habit Title</label>
+                <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                  Habit Title
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Read 20 mins, Workout..."
+                  placeholder="e.g. Read 30 mins, Deep writing..."
                   value={newHabitTitle}
                   onChange={(e) => setNewHabitTitle(e.target.value)}
-                  className="w-full"
+                  className="w-full text-sm"
+                  autoFocus
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Frequency</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Frequency
+                  </label>
                   <select
                     value={newHabitFrequency}
                     onChange={(e: any) => setNewHabitFrequency(e.target.value)}
-                    className="w-full"
+                    className="w-full text-xs font-mono-tabular"
                   >
                     <option value="DAILY">Daily</option>
                     <option value="WEEKLY_TARGET">Weekly Target</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Context</label>
+                  <label className="text-xs font-mono-tabular uppercase tracking-wider text-[#74726A] block mb-1">
+                    Context
+                  </label>
                   <select
                     value={newHabitContextId}
                     onChange={(e) => setNewHabitContextId(e.target.value)}
-                    className="w-full"
+                    className="w-full text-xs"
                   >
                     <option value="">(None)</option>
                     {contexts.map((c) => (
@@ -1055,17 +1144,17 @@ export function TodayView({ onNavigateToAcademic }: TodayViewProps) {
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E3D8]">
                 <button
                   type="button"
                   onClick={() => setIsHabitModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-mono-tabular text-[#74726A] hover:text-[#171614]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg"
+                  className="px-5 py-2 text-xs font-medium text-[#FBFBF9] bg-[#171614] hover:bg-[#2C2B27] rounded transition-colors"
                 >
                   Create Habit
                 </button>
