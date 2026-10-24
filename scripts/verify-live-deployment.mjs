@@ -17,12 +17,13 @@ async function main() {
     const page = await context.newPage();
 
     console.log('1. Navigating to https://unitrack-web-staging.vercel.app...');
-    await page.goto('https://unitrack-web-staging.vercel.app', { waitUntil: 'networkidle' });
+    await page.goto('https://unitrack-web-staging.vercel.app', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
 
     console.log('2. Logging in with live staging user...');
     await page.fill('input[type="email"]', 'staging-live-1792807368692@unitrack.test');
     await page.fill('input[type="password"]', 'Str0ng!Pass123');
-    await page.getByRole('button', { name: 'Sign In', exact: true }).click();
+    await page.locator('button[type="submit"]:has-text("Sign In")').click();
 
     console.log('3. Waiting for Chronicle Today view to load...');
     await page.waitForSelector("text=Today's Commitments", { timeout: 20000 });
