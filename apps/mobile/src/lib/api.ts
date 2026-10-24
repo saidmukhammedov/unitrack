@@ -1,4 +1,4 @@
-import { UniTrackApiClient, TokenStorageAdapter } from '@unitrack/api-client';
+import { UniTrackApiClient, TokenStorageAdapter, OfflineSyncEngine } from '@unitrack/api-client';
 
 class MobileStorageAdapter implements TokenStorageAdapter {
   private accessToken: string | null = null;
@@ -28,3 +28,9 @@ export const mobileApi = new UniTrackApiClient({
   clientType: 'mobile',
   storageAdapter: mobileStorage,
 });
+
+export const mobileSyncEngine = new OfflineSyncEngine({
+  api: mobileApi,
+  autoSyncOnReconnect: false,
+});
+

@@ -10,6 +10,7 @@ import {
 import { generateOpaqueToken, hashToken, getRefreshTokenExpiry } from '../lib/tokens';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/mailer';
 import { verifyGoogleIdToken } from '../lib/google-auth';
+import { contextService } from './context.service';
 import type {
   RegisterInput,
   LoginInput,
@@ -142,6 +143,9 @@ export const authService = {
 
       return newUser;
     });
+
+    // Seed default universal productivity contexts (idempotent)
+    await contextService.seedDefaultContexts(user.id);
 
     return {
       message: 'Account created successfully.',
@@ -311,6 +315,7 @@ export const authService = {
 
         return newUser;
       });
+      await contextService.seedDefaultContexts(user.id);
       }
     }
 

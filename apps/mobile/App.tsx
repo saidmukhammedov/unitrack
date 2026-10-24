@@ -13,6 +13,10 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { mobileApi } from './src/lib/api';
 import type { UserProfile } from '@unitrack/contracts';
+import { MobileTodayTab } from './src/features/today/MobileTodayTab';
+import { MobileHabitsTab } from './src/features/habits/MobileHabitsTab';
+import { MobileGoalsTab } from './src/features/goals/MobileGoalsTab';
+import { MobileReviewTab } from './src/features/reviews/MobileReviewTab';
 import { DashboardTab } from './src/features/academic/DashboardTab';
 import { TimetableTab } from './src/features/academic/TimetableTab';
 import { TasksTab } from './src/features/academic/TasksTab';
@@ -21,11 +25,13 @@ import { GradesTab } from './src/features/academic/GradesTab';
 import { NotificationPreferencesCard } from './src/features/academic/NotificationPreferencesCard';
 
 type AuthScreen = 'login' | 'register' | 'verify' | 'forgot';
-type AcademicTab = 'dashboard' | 'timetable' | 'tasks' | 'assessments' | 'grades' | 'profile';
+type MainTab = 'today' | 'habits' | 'goals' | 'review' | 'academic' | 'profile';
+type AcademicSubTab = 'dashboard' | 'timetable' | 'tasks' | 'assessments' | 'grades';
 
 export default function App() {
   const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
-  const [activeTab, setActiveTab] = useState<AcademicTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<MainTab>('today');
+  const [academicSubTab, setAcademicSubTab] = useState<AcademicSubTab>('dashboard');
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -77,7 +83,7 @@ export default function App() {
     try {
       const res = await mobileApi.login({ email, password });
       setUser(res.user);
-      setActiveTab('dashboard');
+      setActiveTab('today');
       await registerPushDevice(res.user.id);
     } catch (err: any) {
       setErrorMessage(err.message || 'Login failed');
@@ -92,7 +98,7 @@ export default function App() {
     try {
       const res = await mobileApi.googleAuth({ idToken: 'valid-google-id-token' });
       setUser(res.user);
-      setActiveTab('dashboard');
+      setActiveTab('today');
       await registerPushDevice(res.user.id);
     } catch (err: any) {
       setErrorMessage(err.message || 'Google login failed');
@@ -184,26 +190,26 @@ export default function App() {
       {/* ----------------- Header ----------------- */}
       <View style={styles.header}>
         <Text style={styles.brandTitle}>UniTrack</Text>
-        <Text style={styles.brandSubtitle}>Mobile Academic Planner</Text>
+        <Text style={styles.brandSubtitle}>Personal Productivity & Chronicle</Text>
       </View>
 
       {/* ----------------- Authenticated View ----------------- */}
       {user ? (
         <View style={styles.authContainer}>
-          {/* Navigation Tab Bar */}
+          {/* Main Navigation Tab Bar */}
           <View style={styles.tabBar}>
             {[
-              { key: 'dashboard', label: 'Home' },
-              { key: 'timetable', label: 'Schedule' },
-              { key: 'tasks', label: 'Tasks' },
-              { key: 'assessments', label: 'Exams' },
-              { key: 'grades', label: 'Grades' },
+              { key: 'today', label: 'Today' },
+              { key: 'habits', label: 'Habits' },
+              { key: 'goals', label: 'Goals' },
+              { key: 'review', label: 'Review' },
+              { key: 'academic', label: 'Academic' },
               { key: 'profile', label: 'Profile' },
             ].map((tab) => (
               <TouchableOpacity
                 key={tab.key}
                 style={[styles.tabButton, activeTab === tab.key && styles.tabButtonActive]}
-                onPress={() => setActiveTab(tab.key as AcademicTab)}
+                onPress={() => setActiveTab(tab.key as MainTab)}
               >
                 <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
                   {tab.label}
@@ -212,14 +218,68 @@ export default function App() {
             ))}
           </View>
 
+          {/* Academic Sub Navigation when Academic Tab is Active */}
+          {activeTab === 'academic' && (
+            <View style={styles.subTabBar}>
+              {[
+                { key: 'dashboard', label: 'Overview' },
+                { key: 'timetable', label: 'Schedule' },
+                { key: 'tasks', label: 'Tasks' },
+                { key: 'assessments', label: 'Exams' },
+                { key: 'grades', label: 'Grades' },
+              ].map((sub) => (
+                <TouchableOpacity
+                  key={sub.key}
+                  style={[styles.subTabButton, academicSubTab === sub.key && styles.subTabButtonActive]}
+                  onPress={() => setAcademicSubTab(sub.key as AcademicSubTab)}
+                >
+                  <Text style={[styles.subTabText, academicSubTab === sub.key && styles.subTabTextActive]}>
+                    {sub.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            {activeTab === 'dashboard' && (
-              <DashboardTab key={`dash-${refreshKey}`} user={user} onNavigate={(t) => setActiveTab(t as AcademicTab)} />
+            {activeTab === 'today' && (
+              <MobileTodayTab
+                key={`today-${refreshKey}`}
+                onNavigateToAcademic={(tab) => {
+                  setActiveTab('academic');
+                  if (['dashboard', 'timetable', 'tasks', 'assessments', 'grades'].includes(tab)) {
+                    setAcademicSubTab(tab as AcademicSubTab);
+                  }
+                }}
+              />
             )}
-            {activeTab === 'timetable' && <TimetableTab key={`time-${refreshKey}`} />}
-            {activeTab === 'tasks' && <TasksTab key={`task-${refreshKey}`} />}
-            {activeTab === 'assessments' && <AssessmentsTab key={`assess-${refreshKey}`} />}
-            {activeTab === 'grades' && <GradesTab key={`grade-${refreshKey}`} locale={user.languageCode || 'en'} />}
+            {activeTab === 'habits' && <MobileHabitsTab key={`habits-${refreshKey}`} />}
+            {activeTab === 'goals' && <MobileGoalsTab key={`goals-${refreshKey}`} />}
+            {activeTab === 'review' && <MobileReviewTab key={`review-${refreshKey}`} />}
+
+            {/* Academic Hub view */}
+            {activeTab === 'academic' && (
+              <>
+                {academicSubTab === 'dashboard' && (
+                  <DashboardTab
+                    key={`dash-${refreshKey}`}
+                    user={user}
+                    onNavigate={(t) => {
+                      if (['dashboard', 'timetable', 'tasks', 'assessments', 'grades'].includes(t)) {
+                        setAcademicSubTab(t as AcademicSubTab);
+                      }
+                    }}
+                  />
+                )}
+                {academicSubTab === 'timetable' && <TimetableTab key={`time-${refreshKey}`} />}
+                {academicSubTab === 'tasks' && <TasksTab key={`task-${refreshKey}`} />}
+                {academicSubTab === 'assessments' && <AssessmentsTab key={`assess-${refreshKey}`} />}
+                {academicSubTab === 'grades' && (
+                  <GradesTab key={`grade-${refreshKey}`} locale={user.languageCode || 'en'} />
+                )}
+              </>
+            )}
+
             {activeTab === 'profile' && (
               <View style={{ width: '100%', alignItems: 'center' }}>
                 <View style={styles.card}>
@@ -473,6 +533,30 @@ const styles = StyleSheet.create({
   },
   tabTextActive: {
     color: '#fff',
+  },
+  subTabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#2d3748',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    justifyContent: 'space-around',
+  },
+  subTabButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  subTabButtonActive: {
+    backgroundColor: '#4a5568',
+  },
+  subTabText: {
+    color: '#a0aec0',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  subTabTextActive: {
+    color: '#ffffff',
+    fontWeight: '600',
   },
   scrollContent: {
     padding: 16,

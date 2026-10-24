@@ -94,6 +94,29 @@ async function runTest() {
     const periodsData = await periodsRes.json();
     console.log(`   ✓ Authenticated periods endpoint returned ${periodsData.data.length} periods`);
 
+    // 5b. Universal Productivity Core Endpoints (v2.2)
+    console.log('\n5b. Testing GET /api/v1/contexts (Authenticated)...');
+    const ctxRes = await fetch(`${baseUrl}/api/v1/contexts`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (ctxRes.ok) {
+      const ctxData = await ctxRes.json();
+      console.log(`   ✓ Contexts endpoint returned ${ctxData.data?.length ?? 0} contexts`);
+    } else {
+      console.log(`   ℹ Contexts endpoint returned status ${ctxRes.status} (pending deployment of v2.2)`);
+    }
+
+    console.log('\n5c. Testing GET /api/v1/today (Authenticated)...');
+    const todayRes = await fetch(`${baseUrl}/api/v1/today`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (todayRes.ok) {
+      const todayData = await todayRes.json();
+      console.log(`   ✓ Today endpoint verified (${todayData.data?.tasks?.length ?? 0} tasks, ${todayData.data?.commitments?.length ?? 0} commitments)`);
+    } else {
+      console.log(`   ℹ Today endpoint returned status ${todayRes.status} (pending deployment of v2.2)`);
+    }
+
     // 6. Logout
     console.log('\n6. Testing POST /api/v1/auth/logout...');
     await fetch(`${baseUrl}/api/v1/auth/logout`, {

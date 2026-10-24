@@ -15,6 +15,15 @@ import {
 } from './routes/academic.routes';
 import { gradingRoutes } from './routes/grading.routes';
 import notificationRoutes from './routes/notification.routes';
+import {
+  contextsRouter,
+  commitmentsRouter,
+  habitsRouter,
+  todayRouter,
+  goalsRouter,
+  reviewsRouter,
+  syncRouter,
+} from './routes/productivity.routes';
 import { errorHandler } from './middleware/error';
 import type { HealthCheckResponse } from '@unitrack/contracts';
 
@@ -65,6 +74,13 @@ app.use('/api/v1/timetable', timetableRouter);
 app.use('/api/v1/tasks', tasksRouter);
 app.use('/api/v1/assessments', assessmentsRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/api/v1/contexts', contextsRouter);
+app.use('/api/v1/commitments', commitmentsRouter);
+app.use('/api/v1/habits', habitsRouter);
+app.use('/api/v1/today', todayRouter);
+app.use('/api/v1/goals', goalsRouter);
+app.use('/api/v1/reviews', reviewsRouter);
+app.use('/api/v1/sync', syncRouter);
 app.use('/api/v1', gradingRoutes);
 app.use('/api/v1', notificationRoutes);
 

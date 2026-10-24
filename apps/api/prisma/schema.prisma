@@ -85,21 +85,62 @@ enum NotificationStatus {
   SKIPPED
 }
 
+enum TaskStatus {
+  PENDING
+  COMPLETED
+  POSTPONED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CommitmentStatus {
+  ATTENDED
+  MISSED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum HabitFrequencyType {
+  DAILY
+  SELECTED_WEEKDAYS
+  WEEKLY_TARGET
+}
+
+enum HabitLogStatus {
+  COMPLETED
+  SKIPPED
+  MISSED
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  PAUSED
+  ARCHIVED
+}
+
 // -----------------------------------------------------------------------------
 // Models
 // -----------------------------------------------------------------------------
 
 model User {
-  id                      String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email                   String                   @unique @db.VarChar(320)
-  emailVerified           Boolean                  @default(false)
-  displayName             String                   @db.VarChar(100)
-  avatarUrl               String?                  @db.Text
-  timezone                String                   @default("UTC") @db.VarChar(64)
-  languageCode            String                   @default("en") @db.VarChar(10)
-  institutionType         InstitutionType          @default(OTHER)
-  createdAt               DateTime                 @default(now()) @db.Timestamptz
-  updatedAt               DateTime                 @default(now()) @updatedAt @db.Timestamptz
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String          @unique @db.VarChar(320)
+  emailVerified   Boolean         @default(false)
+  displayName     String          @db.VarChar(100)
+  avatarUrl       String?         @db.Text
+  timezone        String          @default("UTC") @db.VarChar(64)
+  languageCode    String          @default("en") @db.VarChar(10)
+  institutionType InstitutionType @default(OTHER)
+  createdAt       DateTime        @default(now()) @db.Timestamptz
+  updatedAt       DateTime        @default(now()) @updatedAt @db.Timestamptz
 
   identities              AuthIdentity[]
   refreshSessions         RefreshSession[]
@@ -113,6 +154,13 @@ model User {
   devices                 Device[]
   notificationPreferences NotificationPreference[]
   notificationDeliveries  NotificationDelivery[]
+  contexts                Context[]
+  commitments             ScheduleCommitment[]
+  commitmentLogs          CommitmentLog[]
+  habits                  Habit[]
+  habitLogs               HabitLog[]
+  goals                   Goal[]
+  weeklyReviews           WeeklyReview[]
 
   @@index([createdAt])
 }
@@ -126,7 +174,7 @@ model AuthIdentity {
   createdAt         DateTime     @default(now()) @db.Timestamptz
   updatedAt         DateTime     @default(now()) @updatedAt @db.Timestamptz
 
-  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -141,24 +189,24 @@ model RefreshSession {
   revokedAt  DateTime? @db.Timestamptz
   createdAt  DateTime  @default(now()) @db.Timestamptz
 
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
   @@index([expiresAt])
 }
 
 model AcademicPeriod {
-  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId        String             @db.Uuid
-  name          String             @db.VarChar(100)
-  type          AcademicPeriodType
-  startDate     DateTime           @db.Date
-  endDate       DateTime           @db.Date
-  isArchived    Boolean            @default(false)
-  createdAt     DateTime           @default(now()) @db.Timestamptz
-  updatedAt     DateTime           @default(now()) @updatedAt @db.Timestamptz
+  id         String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String             @db.Uuid
+  name       String             @db.VarChar(100)
+  type       AcademicPeriodType
+  startDate  DateTime           @db.Date
+  endDate    DateTime           @db.Date
+  isArchived Boolean            @default(false)
+  createdAt  DateTime           @default(now()) @db.Timestamptz
+  updatedAt  DateTime           @default(now()) @updatedAt @db.Timestamptz
 
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   subjects      Subject[]
   classSessions ClassSession[]
   tasks         Task[]
@@ -169,25 +217,25 @@ model AcademicPeriod {
 }
 
 model Subject {
-  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId          String         @db.Uuid
-  periodId        String         @db.Uuid
-  gradingSchemeId String?        @db.Uuid
-  name            String         @db.VarChar(150)
-  colorHex        String?        @db.Char(7)
-  teacherName     String?        @db.VarChar(100)
-  creditHours     Decimal?       @db.Decimal(4, 1)
-  isArchived      Boolean        @default(false)
-  createdAt       DateTime       @default(now()) @db.Timestamptz
-  updatedAt       DateTime       @default(now()) @updatedAt @db.Timestamptz
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @db.Uuid
+  periodId        String   @db.Uuid
+  gradingSchemeId String?  @db.Uuid
+  name            String   @db.VarChar(150)
+  colorHex        String?  @db.Char(7)
+  teacherName     String?  @db.VarChar(100)
+  creditHours     Decimal? @db.Decimal(4, 1)
+  isArchived      Boolean  @default(false)
+  createdAt       DateTime @default(now()) @db.Timestamptz
+  updatedAt       DateTime @default(now()) @updatedAt @db.Timestamptz
 
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  period          AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
-  gradingScheme   GradingScheme? @relation(fields: [gradingSchemeId], references: [id], onDelete: SetNull)
-  classSessions   ClassSession[]
-  tasks           Task[]
-  assessments     Assessment[]
-  courseGrades    CourseGrade[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  period        AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  gradingScheme GradingScheme? @relation(fields: [gradingSchemeId], references: [id], onDelete: SetNull)
+  classSessions ClassSession[]
+  tasks         Task[]
+  assessments   Assessment[]
+  courseGrades  CourseGrade[]
 
   @@unique([id, periodId])
   @@index([userId, periodId])
@@ -195,45 +243,57 @@ model Subject {
 }
 
 model ClassSession {
-  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId        String         @db.Uuid
-  subjectId     String         @db.Uuid
-  periodId      String         @db.Uuid
-  weekday       Int            @db.SmallInt
-  startTime     DateTime       @db.Time
-  endTime       DateTime       @db.Time
-  location      String?        @db.VarChar(150)
-  effectiveFrom DateTime       @db.Date
-  effectiveTo   DateTime?      @db.Date
-  createdAt     DateTime       @default(now()) @db.Timestamptz
-  updatedAt     DateTime       @default(now()) @updatedAt @db.Timestamptz
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String    @db.Uuid
+  subjectId     String    @db.Uuid
+  periodId      String    @db.Uuid
+  weekday       Int       @db.SmallInt
+  startTime     DateTime  @db.Time
+  endTime       DateTime  @db.Time
+  location      String?   @db.VarChar(150)
+  effectiveFrom DateTime  @db.Date
+  effectiveTo   DateTime? @db.Date
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject       Subject        @relation(fields: [subjectId, periodId], references: [id, periodId], onDelete: Cascade)
-  period        AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject        @relation(fields: [subjectId, periodId], references: [id, periodId], onDelete: Cascade)
+  period  AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
 
   @@index([userId, subjectId])
   @@index([userId, periodId, weekday])
 }
 
 model Task {
-  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String          @db.Uuid
-  subjectId   String?         @db.Uuid
-  periodId    String?         @db.Uuid
-  title       String          @db.VarChar(255)
-  description String?         @db.Text
-  taskType    TaskType        @default(OTHER)
-  dueAt       DateTime?       @db.Timestamptz
-  completedAt DateTime?       @db.Timestamptz
-  createdAt   DateTime        @default(now()) @db.Timestamptz
-  updatedAt   DateTime        @default(now()) @updatedAt @db.Timestamptz
+  id               String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String       @db.Uuid
+  subjectId        String?      @db.Uuid
+  periodId         String?      @db.Uuid
+  contextId        String?      @db.Uuid
+  goalId           String?      @db.Uuid
+  title            String       @db.VarChar(255)
+  description      String?      @db.Text
+  taskType         TaskType     @default(OTHER)
+  status           TaskStatus   @default(PENDING)
+  priority         TaskPriority @default(MEDIUM)
+  dueAt            DateTime?    @db.Timestamptz
+  completedAt      DateTime?    @db.Timestamptz
+  postponedCount   Int          @default(0)
+  estimatedMinutes Int?
+  version          Int          @default(1)
+  createdAt        DateTime     @default(now()) @db.Timestamptz
+  updatedAt        DateTime     @default(now()) @updatedAt @db.Timestamptz
 
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject     Subject?        @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  period      AcademicPeriod? @relation(fields: [periodId], references: [id], onDelete: SetNull)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject?        @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  period  AcademicPeriod? @relation(fields: [periodId], references: [id], onDelete: SetNull)
+  context Context?        @relation(fields: [contextId], references: [id], onDelete: SetNull)
+  goal    Goal?           @relation(fields: [goalId], references: [id], onDelete: SetNull)
 
   @@index([userId, dueAt])
+  @@index([userId, status])
+  @@index([userId, contextId])
+  @@index([userId, goalId])
   @@index([userId, subjectId])
   @@index([userId, completedAt])
 }
@@ -254,9 +314,9 @@ model Assessment {
   createdAt      DateTime         @default(now()) @db.Timestamptz
   updatedAt      DateTime         @default(now()) @updatedAt @db.Timestamptz
 
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject        Subject          @relation(fields: [subjectId, periodId], references: [id, periodId], onDelete: Cascade)
-  period         AcademicPeriod   @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject        @relation(fields: [subjectId, periodId], references: [id, periodId], onDelete: Cascade)
+  period  AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
 
   @@index([userId, subjectId])
   @@index([userId, periodId])
@@ -265,14 +325,14 @@ model Assessment {
 }
 
 model GradingScheme {
-  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId       String            @db.Uuid
-  name         String            @db.VarChar(100)
-  schemeType   GradingSchemeType
-  version      Int               @default(1)
-  isDefault    Boolean           @default(false)
-  createdAt    DateTime          @default(now()) @db.Timestamptz
-  updatedAt    DateTime          @default(now()) @updatedAt @db.Timestamptz
+  id         String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String            @db.Uuid
+  name       String            @db.VarChar(100)
+  schemeType GradingSchemeType
+  version    Int               @default(1)
+  isDefault  Boolean           @default(false)
+  createdAt  DateTime          @default(now()) @db.Timestamptz
+  updatedAt  DateTime          @default(now()) @updatedAt @db.Timestamptz
 
   user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   scaleEntries GradeScaleEntry[]
@@ -284,55 +344,55 @@ model GradingScheme {
 }
 
 model GradeScaleEntry {
-  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  schemeId      String        @db.Uuid
-  label         String        @db.VarChar(20)
-  minPercentage Decimal       @db.Decimal(5, 2)
-  maxPercentage Decimal       @db.Decimal(5, 2)
-  gradePoints   Decimal?      @db.Decimal(4, 2)
-  sortOrder     Int           @db.SmallInt
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schemeId      String   @db.Uuid
+  label         String   @db.VarChar(20)
+  minPercentage Decimal  @db.Decimal(5, 2)
+  maxPercentage Decimal  @db.Decimal(5, 2)
+  gradePoints   Decimal? @db.Decimal(4, 2)
+  sortOrder     Int      @db.SmallInt
 
-  scheme        GradingScheme @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+  scheme GradingScheme @relation(fields: [schemeId], references: [id], onDelete: Cascade)
 
   @@index([schemeId, sortOrder])
 }
 
 model CourseGrade {
-  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId              String         @db.Uuid
-  subjectId           String         @db.Uuid
-  schemeId            String?        @db.Uuid
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String   @db.Uuid
+  subjectId           String   @db.Uuid
+  schemeId            String?  @db.Uuid
   schemeVersion       Int
-  computedPercentage  Decimal?       @db.Decimal(5, 2)
-  computedBand        String?        @db.VarChar(20)
-  computedGradePoints Decimal?       @db.Decimal(4, 2)
-  assessmentsIncluded Int            @default(0)
-  assessmentsExcluded Int            @default(0)
-  totalWeight         Decimal?       @db.Decimal(6, 4)
-  isManualOverride    Boolean        @default(false)
-  overrideNotes       String?        @db.Text
-  calculatedAt        DateTime       @default(now()) @db.Timestamptz
-  createdAt           DateTime       @default(now()) @db.Timestamptz
+  computedPercentage  Decimal? @db.Decimal(5, 2)
+  computedBand        String?  @db.VarChar(20)
+  computedGradePoints Decimal? @db.Decimal(4, 2)
+  assessmentsIncluded Int      @default(0)
+  assessmentsExcluded Int      @default(0)
+  totalWeight         Decimal? @db.Decimal(6, 4)
+  isManualOverride    Boolean  @default(false)
+  overrideNotes       String?  @db.Text
+  calculatedAt        DateTime @default(now()) @db.Timestamptz
+  createdAt           DateTime @default(now()) @db.Timestamptz
 
-  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject             Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  scheme              GradingScheme? @relation(fields: [schemeId], references: [id], onDelete: SetNull)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  scheme  GradingScheme? @relation(fields: [schemeId], references: [id], onDelete: SetNull)
 
   @@index([userId, subjectId, calculatedAt(sort: Desc), createdAt(sort: Desc)])
   @@index([userId, subjectId])
 }
 
 model Device {
-  id            String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId        String                 @db.Uuid
-  expoPushToken String                 @unique @db.Text
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String         @db.Uuid
+  expoPushToken String         @unique @db.Text
   platform      DevicePlatform
-  deviceLabel   String?                @db.VarChar(100)
-  lastSeenAt    DateTime               @default(now()) @db.Timestamptz
-  createdAt     DateTime               @default(now()) @db.Timestamptz
+  deviceLabel   String?        @db.VarChar(100)
+  lastSeenAt    DateTime       @default(now()) @db.Timestamptz
+  createdAt     DateTime       @default(now()) @db.Timestamptz
 
-  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deliveries    NotificationDelivery[]
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
 
   @@index([userId])
 }
@@ -345,7 +405,7 @@ model NotificationPreference {
   leadTimeMinutes Int
   updatedAt       DateTime             @default(now()) @updatedAt @db.Timestamptz
 
-  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, category])
 }
@@ -362,10 +422,191 @@ model NotificationDelivery {
   sentAt        DateTime?                 @db.Timestamptz
   createdAt     DateTime                  @default(now()) @db.Timestamptz
 
-  user          User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  device        Device?                   @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
 
   @@index([userId, status])
   @@index([referenceType, referenceId])
   @@index([scheduledFor, status])
+}
+
+// -----------------------------------------------------------------------------
+// Universal Productivity Models (The Chronicle)
+// -----------------------------------------------------------------------------
+
+model Context {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @db.Uuid
+  name       String   @db.VarChar(50)
+  colorHex   String   @db.Char(7)
+  icon       String?  @db.VarChar(30)
+  sortOrder  Int      @default(0)
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+  commitments ScheduleCommitment[]
+  habits      Habit[]
+  goals       Goal[]
+
+  @@unique([userId, name])
+  @@index([userId, isArchived, sortOrder])
+}
+
+model ScheduleCommitment {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String    @db.Uuid
+  contextId     String?   @db.Uuid
+  title         String    @db.VarChar(200)
+  location      String?   @db.VarChar(150)
+  isRecurring   Boolean   @default(false)
+  specificDate  DateTime? @db.Date
+  weekday       Int?      @db.SmallInt
+  startTime     DateTime  @db.Time
+  endTime       DateTime  @db.Time
+  isOvernight   Boolean   @default(false)
+  effectiveFrom DateTime  @db.Date
+  effectiveTo   DateTime? @db.Date
+  isArchived    Boolean   @default(false)
+  version       Int       @default(1)
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  context Context?        @relation(fields: [contextId], references: [id], onDelete: SetNull)
+  logs    CommitmentLog[]
+
+  @@index([userId, isArchived])
+  @@index([userId, isRecurring, weekday])
+  @@index([userId, specificDate])
+}
+
+model CommitmentLog {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String           @db.Uuid
+  commitmentId         String           @db.Uuid
+  date                 DateTime         @db.Date
+  status               CommitmentStatus
+  rescheduledStartTime DateTime?        @db.Time
+  rescheduledEndTime   DateTime?        @db.Time
+  notes                String?          @db.Text
+  createdAt            DateTime         @default(now()) @db.Timestamptz
+  updatedAt            DateTime         @default(now()) @updatedAt @db.Timestamptz
+
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commitment ScheduleCommitment @relation(fields: [commitmentId], references: [id], onDelete: Cascade)
+
+  @@unique([commitmentId, date])
+  @@index([userId, date])
+}
+
+model Habit {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String             @db.Uuid
+  contextId        String?            @db.Uuid
+  goalId           String?            @db.Uuid
+  title            String             @db.VarChar(150)
+  frequencyType    HabitFrequencyType @default(DAILY)
+  selectedWeekdays Int[]
+  targetPerWeek    Int?               @db.SmallInt
+  targetUnits      Int                @default(1)
+  unitLabel        String?            @db.VarChar(30)
+  currentStreak    Int                @default(0)
+  longestStreak    Int                @default(0)
+  isArchived       Boolean            @default(false)
+  version          Int                @default(1)
+  createdAt        DateTime           @default(now()) @db.Timestamptz
+  updatedAt        DateTime           @default(now()) @updatedAt @db.Timestamptz
+
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  context Context?   @relation(fields: [contextId], references: [id], onDelete: SetNull)
+  goal    Goal?      @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  logs    HabitLog[]
+
+  @@index([userId, isArchived])
+  @@index([userId, goalId])
+}
+
+model HabitLog {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String         @db.Uuid
+  habitId        String         @db.Uuid
+  date           DateTime       @db.Date
+  status         HabitLogStatus @default(COMPLETED)
+  completedUnits Int            @default(1)
+  notes          String?        @db.Text
+  createdAt      DateTime       @default(now()) @db.Timestamptz
+  updatedAt      DateTime       @default(now()) @updatedAt @db.Timestamptz
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@index([userId, date])
+}
+
+model Goal {
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String     @db.Uuid
+  contextId          String?    @db.Uuid
+  title              String     @db.VarChar(200)
+  description        String?    @db.Text
+  status             GoalStatus @default(IN_PROGRESS)
+  targetDate         DateTime?  @db.Date
+  progressPercentage Int        @default(0)
+  isArchived         Boolean    @default(false)
+  version            Int        @default(1)
+  createdAt          DateTime   @default(now()) @db.Timestamptz
+  updatedAt          DateTime   @default(now()) @updatedAt @db.Timestamptz
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  context    Context?    @relation(fields: [contextId], references: [id], onDelete: SetNull)
+  milestones Milestone[]
+  tasks      Task[]
+  habits     Habit[]
+
+  @@index([userId, isArchived])
+  @@index([userId, contextId])
+}
+
+model Milestone {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  goalId      String    @db.Uuid
+  title       String    @db.VarChar(200)
+  targetDate  DateTime? @db.Date
+  isCompleted Boolean   @default(false)
+  completedAt DateTime? @db.Timestamptz
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamptz
+
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId, sortOrder])
+}
+
+model WeeklyReview {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String   @db.Uuid
+  weekStart           DateTime @db.Date
+  weekEnd             DateTime @db.Date
+  weekNumber          Int      @db.SmallInt
+  year                Int      @db.SmallInt
+  whatWentWell        String   @default("") @db.Text
+  whatToImprove       String   @default("") @db.Text
+  keyTakeaways        String   @default("") @db.Text
+  intentions          String[]
+  commitmentsAttended Int      @default(0)
+  tasksCompleted      Int      @default(0)
+  habitCompletions    Int      @default(0)
+  version             Int      @default(1)
+  createdAt           DateTime @default(now()) @db.Timestamptz
+  updatedAt           DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([userId, year, weekNumber])
 }

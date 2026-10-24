@@ -553,6 +553,7 @@ export const academicService = {
       }),
       include: {
         subject: { select: { name: true, colorHex: true } },
+        context: { select: { name: true, colorHex: true } },
       },
       orderBy: [{ dueAt: 'asc' }, { createdAt: 'desc' }, { id: 'asc' }],
     });
@@ -569,13 +570,21 @@ export const academicService = {
         title: t.title,
         description: t.description,
         taskType: t.taskType as any,
+        status: t.status,
+        priority: t.priority,
+        contextId: t.contextId,
+        contextName: t.context?.name || null,
+        contextColor: t.context?.colorHex || null,
         subjectId: t.subjectId,
         subjectName: t.subject?.name || null,
         subjectColor: t.subject?.colorHex || null,
         periodId: t.periodId,
         dueAt: t.dueAt ? t.dueAt.toISOString() : null,
         completedAt: t.completedAt ? t.completedAt.toISOString() : null,
-        isCompleted: t.completedAt !== null,
+        isCompleted: t.status === 'COMPLETED' || t.completedAt !== null,
+        postponedCount: t.postponedCount,
+        estimatedMinutes: t.estimatedMinutes,
+        version: t.version,
         createdAt: t.createdAt.toISOString(),
         updatedAt: t.updatedAt.toISOString(),
       })),
@@ -584,6 +593,15 @@ export const academicService = {
   },
 
   async createTask(userId: string, input: CreateTaskInput): Promise<Task> {
+    if (input.contextId) {
+      const context = await prisma.context.findFirst({
+        where: { id: input.contextId, userId },
+      });
+      if (!context) {
+        throw new AuthError(404, 'CONTEXT_NOT_FOUND', 'Context not found.');
+      }
+    }
+
     if (input.subjectId) {
       const subject = await prisma.subject.findFirst({
         where: { id: input.subjectId, userId },
@@ -608,12 +626,17 @@ export const academicService = {
         title: input.title,
         description: input.description || null,
         taskType: input.taskType || 'OTHER',
+        status: 'PENDING',
+        priority: input.priority || 'MEDIUM',
+        contextId: input.contextId || null,
         subjectId: input.subjectId || null,
         periodId: input.periodId || null,
         dueAt: input.dueAt ? new Date(input.dueAt) : null,
+        estimatedMinutes: input.estimatedMinutes || null,
       },
       include: {
         subject: { select: { name: true, colorHex: true } },
+        context: { select: { name: true, colorHex: true } },
       },
     });
 
@@ -622,13 +645,21 @@ export const academicService = {
       title: task.title,
       description: task.description,
       taskType: task.taskType as any,
+      status: task.status,
+      priority: task.priority,
+      contextId: task.contextId,
+      contextName: task.context?.name || null,
+      contextColor: task.context?.colorHex || null,
       subjectId: task.subjectId,
       subjectName: task.subject?.name || null,
       subjectColor: task.subject?.colorHex || null,
       periodId: task.periodId,
       dueAt: task.dueAt ? task.dueAt.toISOString() : null,
       completedAt: task.completedAt ? task.completedAt.toISOString() : null,
-      isCompleted: task.completedAt !== null,
+      isCompleted: false,
+      postponedCount: task.postponedCount,
+      estimatedMinutes: task.estimatedMinutes,
+      version: task.version,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };
@@ -639,6 +670,7 @@ export const academicService = {
       where: { id: taskId, userId },
       include: {
         subject: { select: { name: true, colorHex: true } },
+        context: { select: { name: true, colorHex: true } },
       },
     });
 
@@ -651,13 +683,21 @@ export const academicService = {
       title: task.title,
       description: task.description,
       taskType: task.taskType as any,
+      status: task.status,
+      priority: task.priority,
+      contextId: task.contextId,
+      contextName: task.context?.name || null,
+      contextColor: task.context?.colorHex || null,
       subjectId: task.subjectId,
       subjectName: task.subject?.name || null,
       subjectColor: task.subject?.colorHex || null,
       periodId: task.periodId,
       dueAt: task.dueAt ? task.dueAt.toISOString() : null,
       completedAt: task.completedAt ? task.completedAt.toISOString() : null,
-      isCompleted: task.completedAt !== null,
+      isCompleted: task.status === 'COMPLETED' || task.completedAt !== null,
+      postponedCount: task.postponedCount,
+      estimatedMinutes: task.estimatedMinutes,
+      version: task.version,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
     };
@@ -672,6 +712,19 @@ export const academicService = {
       throw new AuthError(404, 'TASK_NOT_FOUND', 'Task not found.');
     }
 
+    if (input.version !== undefined && input.version !== task.version) {
+      throw new AuthError(409, 'VERSION_CONFLICT', 'Record was modified concurrently.');
+    }
+
+    if (input.contextId) {
+      const context = await prisma.context.findFirst({
+        where: { id: input.contextId, userId },
+      });
+      if (!context) {
+        throw new AuthError(404, 'CONTEXT_NOT_FOUND', 'Context not found.');
+      }
+    }
+
     if (input.subjectId) {
       const subject = await prisma.subject.findFirst({
         where: { id: input.subjectId, userId },
@@ -681,23 +734,42 @@ export const academicService = {
       }
     }
 
+    let nextStatus = input.status !== undefined ? input.status : task.status;
+    let nextCompletedAt: Date | null = task.completedAt;
+
+    if (input.completedAt !== undefined) {
+      nextCompletedAt = input.completedAt ? new Date(input.completedAt) : null;
+      nextStatus = nextCompletedAt ? 'COMPLETED' : 'PENDING';
+    } else if (input.status !== undefined) {
+      if (input.status === 'COMPLETED') {
+        if (!task.completedAt) nextCompletedAt = new Date();
+      } else {
+        nextCompletedAt = null;
+      }
+    }
+
     const updated = await prisma.task.update({
       where: { id: taskId },
       data: {
         ...(input.title && { title: input.title }),
         ...(input.description !== undefined && { description: input.description }),
         ...(input.taskType && { taskType: input.taskType }),
+        ...(input.priority && { priority: input.priority }),
+        status: nextStatus,
+        completedAt: nextCompletedAt,
+        ...(input.status === 'POSTPONED' && { postponedCount: { increment: 1 } }),
+        ...(input.contextId !== undefined && { contextId: input.contextId }),
         ...(input.subjectId !== undefined && { subjectId: input.subjectId }),
         ...(input.periodId !== undefined && { periodId: input.periodId }),
         ...(input.dueAt !== undefined && {
           dueAt: input.dueAt ? new Date(input.dueAt) : null,
         }),
-        ...(input.completedAt !== undefined && {
-          completedAt: input.completedAt ? new Date(input.completedAt) : null,
-        }),
+        ...(input.estimatedMinutes !== undefined && { estimatedMinutes: input.estimatedMinutes }),
+        version: { increment: 1 },
       },
       include: {
         subject: { select: { name: true, colorHex: true } },
+        context: { select: { name: true, colorHex: true } },
       },
     });
 
@@ -706,13 +778,21 @@ export const academicService = {
       title: updated.title,
       description: updated.description,
       taskType: updated.taskType as any,
+      status: updated.status,
+      priority: updated.priority,
+      contextId: updated.contextId,
+      contextName: updated.context?.name || null,
+      contextColor: updated.context?.colorHex || null,
       subjectId: updated.subjectId,
       subjectName: updated.subject?.name || null,
       subjectColor: updated.subject?.colorHex || null,
       periodId: updated.periodId,
       dueAt: updated.dueAt ? updated.dueAt.toISOString() : null,
       completedAt: updated.completedAt ? updated.completedAt.toISOString() : null,
-      isCompleted: updated.completedAt !== null,
+      isCompleted: updated.status === 'COMPLETED' || updated.completedAt !== null,
+      postponedCount: updated.postponedCount,
+      estimatedMinutes: updated.estimatedMinutes,
+      version: updated.version,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
     };
@@ -1079,6 +1159,9 @@ export const academicService = {
         title: t.title,
         description: t.description,
         taskType: t.taskType as any,
+        status: t.status,
+        priority: t.priority,
+        contextId: t.contextId,
         subjectId: t.subjectId,
         subjectName: t.subject?.name || null,
         subjectColor: t.subject?.colorHex || null,
@@ -1086,6 +1169,9 @@ export const academicService = {
         dueAt: t.dueAt ? t.dueAt.toISOString() : null,
         completedAt: null,
         isCompleted: false,
+        postponedCount: t.postponedCount,
+        estimatedMinutes: t.estimatedMinutes,
+        version: t.version,
         createdAt: t.createdAt.toISOString(),
       })),
       upcomingTasks: upcomingTasksDb.map((t) => ({
@@ -1093,6 +1179,9 @@ export const academicService = {
         title: t.title,
         description: t.description,
         taskType: t.taskType as any,
+        status: t.status,
+        priority: t.priority,
+        contextId: t.contextId,
         subjectId: t.subjectId,
         subjectName: t.subject?.name || null,
         subjectColor: t.subject?.colorHex || null,
@@ -1100,6 +1189,9 @@ export const academicService = {
         dueAt: t.dueAt ? t.dueAt.toISOString() : null,
         completedAt: null,
         isCompleted: false,
+        postponedCount: t.postponedCount,
+        estimatedMinutes: t.estimatedMinutes,
+        version: t.version,
         createdAt: t.createdAt.toISOString(),
       })),
       upcomingAssessments: upcomingAssessmentsDb.map((a) => ({

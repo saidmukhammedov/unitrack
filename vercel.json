@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm --filter @unitrack/contracts build && pnpm --filter @unitrack/i18n build && pnpm --filter @unitrack/academic-core build && pnpm --filter @unitrack/api-client build && pnpm --filter @unitrack/web build",
+  "outputDirectory": "apps/web/dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://unitrack-api-staging.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

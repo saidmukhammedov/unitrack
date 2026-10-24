@@ -20,6 +20,11 @@
     "no": "No"
   },
   "nav": {
+    "today": "Today",
+    "reviews": "Plan & Review",
+    "goals": "Goals",
+    "habits": "Habits",
+    "academicHub": "Academic Hub",
     "dashboard": "Dashboard",
     "periods": "Periods",
     "subjects": "Subjects",
@@ -124,5 +129,43 @@
       "title": "Upcoming Assessment",
       "body": "\"{{assessmentTitle}}\" in {{subjectName}} is in {{leadTime}}."
     }
+  },
+  "productivity": {
+    "today": "Today",
+    "theChronicle": "The Chronicle",
+    "timeline": "Timeline",
+    "habits": "Habits & Rituals",
+    "intentions": "Top Intentions",
+    "rhythmSummary": "Daily Rhythm",
+    "commitments": "Scheduled Commitments",
+    "attended": "Attended",
+    "missed": "Missed",
+    "cancelled": "Cancelled",
+    "rescheduled": "Rescheduled",
+    "streak": "Streak",
+    "bestStreak": "Best Streak"
+  },
+  "goals": {
+    "title": "Goals & Horizons",
+    "newGoal": "New Goal",
+    "milestones": "Key Milestones",
+    "addMilestone": "Add Milestone",
+    "progress": "Progress"
+  },
+  "reviews": {
+    "title": "Weekly Planning & Review",
+    "reflections": "Reflections",
+    "intentions": "Intentions for Next Week",
+    "weekAtGlance": "Week at a Glance",
+    "whatWentWell": "What went well",
+    "whatToImprove": "Friction & Challenges",
+    "keyTakeaways": "Key Insight / Lesson",
+    "saveReview": "Commit Weekly Review"
+  },
+  "contexts": {
+    "title": "Contexts",
+    "personal": "Personal",
+    "work": "Work",
+    "study": "Study"
   }
 }

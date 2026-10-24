@@ -20,6 +20,11 @@
     "no": "Нет"
   },
   "nav": {
+    "today": "Сегодня",
+    "reviews": "План и итоги",
+    "goals": "Цели",
+    "habits": "Привычки",
+    "academicHub": "Учеба",
     "dashboard": "Дашборд",
     "periods": "Периоды",
     "subjects": "Предметы",
@@ -124,5 +129,43 @@
       "title": "Предстоящая проверка",
       "body": "\"{{assessmentTitle}}\" по предмету {{subjectName}} через {{leadTime}}."
     }
+  },
+  "productivity": {
+    "today": "Сегодня",
+    "theChronicle": "Хроника дня",
+    "timeline": "Лента дня",
+    "habits": "Привычки и ритуалы",
+    "intentions": "Главные фокусы",
+    "rhythmSummary": "Дневной ритм",
+    "commitments": "Запланированные события",
+    "attended": "Посещено",
+    "missed": "Пропущено",
+    "cancelled": "Отменено",
+    "rescheduled": "Перенесено",
+    "streak": "Серия",
+    "bestStreak": "Лучшая серия"
+  },
+  "goals": {
+    "title": "Цели и горизонты",
+    "newGoal": "Новая цель",
+    "milestones": "Ключевые этапы",
+    "addMilestone": "Добавить этап",
+    "progress": "Прогресс"
+  },
+  "reviews": {
+    "title": "Планирование и ретроспектива",
+    "reflections": "Размышления недели",
+    "intentions": "Планы на следующую неделю",
+    "weekAtGlance": "Итоги недели",
+    "whatWentWell": "Что прошло отлично",
+    "whatToImprove": "Сложности и трения",
+    "keyTakeaways": "Главный вывод недели",
+    "saveReview": "Зафиксировать обзор недели"
+  },
+  "contexts": {
+    "title": "Контексты",
+    "personal": "Личное",
+    "work": "Работа",
+    "study": "Учеба"
   }
 }

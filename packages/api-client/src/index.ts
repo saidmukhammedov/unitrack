@@ -49,6 +49,34 @@ import type {
   NotificationPreferenceListResponse,
   UpdateNotificationPreferenceInput,
   NotificationCategory,
+  Context,
+  CreateContextInput,
+  UpdateContextInput,
+  ContextListResponse,
+  ScheduleCommitment,
+  CreateScheduleCommitmentInput,
+  UpdateScheduleCommitmentInput,
+  CommitmentLog,
+  LogCommitmentOccurrenceInput,
+  Habit,
+  CreateHabitInput,
+  UpdateHabitInput,
+  HabitLog,
+  LogHabitOccurrenceInput,
+  HabitListResponse,
+  TodayResponse,
+  Goal,
+  CreateGoalInput,
+  UpdateGoalInput,
+  GoalListResponse,
+  Milestone,
+  CreateMilestoneInput,
+  UpdateMilestoneInput,
+  WeeklyReview,
+  SaveWeeklyReviewInput,
+  WeeklyReviewListResponse,
+  BatchSyncRequest,
+  BatchSyncResponse,
 } from '@unitrack/contracts';
 
 /**
@@ -723,4 +751,272 @@ export class UniTrackApiClient {
   }> {
     return this.request('/api/v1/notifications/dispatch', { method: 'POST' }, true);
   }
+
+  // ---------------------------------------------------------------------------
+  // Universal Productivity (The Chronicle)
+  // ---------------------------------------------------------------------------
+
+  async getContexts(): Promise<ContextListResponse> {
+    return this.request<ContextListResponse>('/api/v1/contexts', { method: 'GET' }, true);
+  }
+
+  async createContext(input: CreateContextInput, idempotencyKey?: string): Promise<Context> {
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+    return this.request<Context>(
+      '/api/v1/contexts',
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async updateContext(id: string, input: UpdateContextInput): Promise<Context> {
+    return this.request<Context>(
+      `/api/v1/contexts/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async deleteContext(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/contexts/${id}`, { method: 'DELETE' }, true);
+  }
+
+  async getCommitments(): Promise<{ data: ScheduleCommitment[] }> {
+    return this.request<{ data: ScheduleCommitment[] }>('/api/v1/commitments', { method: 'GET' }, true);
+  }
+
+  async createCommitment(
+    input: CreateScheduleCommitmentInput,
+    idempotencyKey?: string
+  ): Promise<ScheduleCommitment> {
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+    return this.request<ScheduleCommitment>(
+      '/api/v1/commitments',
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async updateCommitment(
+    id: string,
+    input: UpdateScheduleCommitmentInput
+  ): Promise<ScheduleCommitment> {
+    return this.request<ScheduleCommitment>(
+      `/api/v1/commitments/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async deleteCommitment(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/commitments/${id}`, { method: 'DELETE' }, true);
+  }
+
+  async logCommitmentOccurrence(
+    id: string,
+    date: string,
+    input: LogCommitmentOccurrenceInput
+  ): Promise<CommitmentLog> {
+    return this.request<CommitmentLog>(
+      `/api/v1/commitments/${id}/occurrences/${date}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async getHabits(): Promise<HabitListResponse> {
+    return this.request<HabitListResponse>('/api/v1/habits', { method: 'GET' }, true);
+  }
+
+  async createHabit(input: CreateHabitInput, idempotencyKey?: string): Promise<Habit> {
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+    return this.request<Habit>(
+      '/api/v1/habits',
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async updateHabit(id: string, input: UpdateHabitInput): Promise<Habit> {
+    return this.request<Habit>(
+      `/api/v1/habits/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async deleteHabit(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/habits/${id}`, { method: 'DELETE' }, true);
+  }
+
+  async logHabitOccurrence(
+    id: string,
+    input: LogHabitOccurrenceInput
+  ): Promise<HabitLog> {
+    return this.request<HabitLog>(
+      `/api/v1/habits/${id}/logs`,
+      {
+        method: 'POST',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async getToday(query?: { date?: string; timezone?: string }): Promise<TodayResponse> {
+    const params = new URLSearchParams();
+    if (query?.date) params.append('date', query.date);
+    if (query?.timezone) params.append('timezone', query.timezone);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return this.request<TodayResponse>(`/api/v1/today${qs}`, { method: 'GET' }, true);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Goals & Milestones
+  // ---------------------------------------------------------------------------
+
+  async getGoals(): Promise<GoalListResponse> {
+    return this.request<GoalListResponse>('/api/v1/goals', { method: 'GET' }, true);
+  }
+
+  async getGoalById(id: string): Promise<Goal> {
+    return this.request<Goal>(`/api/v1/goals/${id}`, { method: 'GET' }, true);
+  }
+
+  async createGoal(input: CreateGoalInput, idempotencyKey?: string): Promise<Goal> {
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+    return this.request<Goal>(
+      '/api/v1/goals',
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async updateGoal(id: string, input: UpdateGoalInput): Promise<Goal> {
+    return this.request<Goal>(
+      `/api/v1/goals/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async deleteGoal(id: string): Promise<void> {
+    return this.request<void>(`/api/v1/goals/${id}`, { method: 'DELETE' }, true);
+  }
+
+  async createMilestone(goalId: string, input: CreateMilestoneInput): Promise<Milestone> {
+    return this.request<Milestone>(
+      `/api/v1/goals/${goalId}/milestones`,
+      {
+        method: 'POST',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async updateMilestone(
+    goalId: string,
+    milestoneId: string,
+    input: UpdateMilestoneInput
+  ): Promise<Milestone> {
+    return this.request<Milestone>(
+      `/api/v1/goals/${goalId}/milestones/${milestoneId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  async deleteMilestone(goalId: string, milestoneId: string): Promise<void> {
+    return this.request<void>(
+      `/api/v1/goals/${goalId}/milestones/${milestoneId}`,
+      { method: 'DELETE' },
+      true
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Weekly Planning & Reviews
+  // ---------------------------------------------------------------------------
+
+  async getWeeklyReviews(): Promise<WeeklyReviewListResponse> {
+    return this.request<WeeklyReviewListResponse>('/api/v1/reviews', { method: 'GET' }, true);
+  }
+
+  async getReviewForWeek(weekStart: string): Promise<WeeklyReview> {
+    return this.request<WeeklyReview>(`/api/v1/reviews/${weekStart}`, { method: 'GET' }, true);
+  }
+
+  async saveWeeklyReview(
+    input: SaveWeeklyReviewInput,
+    idempotencyKey?: string
+  ): Promise<WeeklyReview> {
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey;
+    return this.request<WeeklyReview>(
+      '/api/v1/reviews',
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input),
+      },
+      true
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Offline Sync
+  // ---------------------------------------------------------------------------
+
+  async batchSync(request: BatchSyncRequest): Promise<BatchSyncResponse> {
+    return this.request<BatchSyncResponse>(
+      '/api/v1/sync',
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+  }
 }
+
+export * from './offline-sync';
+

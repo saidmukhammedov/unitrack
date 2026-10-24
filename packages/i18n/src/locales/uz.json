@@ -20,6 +20,11 @@
     "no": "Yo'q"
   },
   "nav": {
+    "today": "Bugun",
+    "reviews": "Reja va tahlil",
+    "goals": "Maqsadlar",
+    "habits": "Odatlar",
+    "academicHub": "Ta'lim",
     "dashboard": "Bosh sahifa",
     "periods": "O'quv davrlari",
     "subjects": "Fanlar",
@@ -124,5 +129,43 @@
       "title": "Yaqinlashib kelayotgan nazorat",
       "body": "{{subjectName}} fanidan \"{{assessmentTitle}}\" nazoratiga {{leadTime}} qoldi."
     }
+  },
+  "productivity": {
+    "today": "Bugun",
+    "theChronicle": "Kun yilnomasi",
+    "timeline": "Kun tartibi",
+    "habits": "Odatlar va marosimlar",
+    "intentions": "Asosiy niyatlar",
+    "rhythmSummary": "Kun maromi",
+    "commitments": "Rejalashtirilgan tadbirlar",
+    "attended": "Qatnashildi",
+    "missed": "Qoldirildi",
+    "cancelled": "Bekor qilindi",
+    "rescheduled": "Ko'chirildi",
+    "streak": "Ketma-ketlik",
+    "bestStreak": "Eng yaxshi natija"
+  },
+  "goals": {
+    "title": "Maqsadlar va marralar",
+    "newGoal": "Yangi maqsad",
+    "milestones": "Asosiy bosqichlar",
+    "addMilestone": "Bosqich qo'shish",
+    "progress": "O'sish"
+  },
+  "reviews": {
+    "title": "Haftalik reja va tahlil",
+    "reflections": "Haftalik mulohazalar",
+    "intentions": "Keyingi hafta niyatlari",
+    "weekAtGlance": "Hafta sarhisobi",
+    "whatWentWell": "Nimalar yaxshi o'tdi",
+    "whatToImprove": "Qiyinchiliklar va kamchiliklar",
+    "keyTakeaways": "Asosiy saboq",
+    "saveReview": "Haftalik hisobotni saqlash"
+  },
+  "contexts": {
+    "title": "Kontekstlar",
+    "personal": "Shaxsiy",
+    "work": "Ish",
+    "study": "O'qish"
   }
 }
