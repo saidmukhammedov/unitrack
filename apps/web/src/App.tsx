@@ -60,11 +60,22 @@ function MainApp() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FBFBF9] text-[#171614] flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-[#FBFBF9] text-[#171614] flex flex-col items-center justify-center space-y-4 px-4 text-center">
         <div className="w-8 h-8 rounded-full border-2 border-[#171614] border-t-transparent animate-spin" />
         <p className="font-serif-chronicle italic text-[#74726A] text-lg">
           Opening The Chronicle...
         </p>
+        <button
+          onClick={() => {
+            try {
+              localStorage.removeItem('unitrack_has_session');
+            } catch {}
+            window.location.reload();
+          }}
+          className="text-xs font-mono text-[#A09D92] hover:text-[#171614] underline pt-2 transition-colors cursor-pointer"
+        >
+          Taking a moment? Continue to sign in
+        </button>
       </div>
     );
   }

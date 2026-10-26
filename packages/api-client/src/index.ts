@@ -117,7 +117,10 @@ export class UniTrackApiClient {
   private storageAdapter?: TokenStorageAdapter;
   private memoryAccessToken: string | null = null;
   private isRefreshing = false;
-  private refreshSubscribers: ((token: string) => void)[] = [];
+  private refreshSubscribers: Array<{
+    resolve: (token: string) => void;
+    reject: (err: unknown) => void;
+  }> = [];
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl ? config.baseUrl.replace(/\/$/, '') : '';
@@ -178,32 +181,50 @@ export class UniTrackApiClient {
       }
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: options.credentials || 'include',
-    });
-
-    if (response.status === 401 && requireAuth && !endpoint.includes('/auth/refresh')) {
-      // Trigger silent token refresh
-      try {
-        const refreshedToken = await this.performSilentRefresh();
-        if (refreshedToken) {
-          headers.set('Authorization', `Bearer ${refreshedToken}`);
-          const retryResponse = await fetch(url, {
-            ...options,
-            headers,
-            credentials: options.credentials || 'include',
-          });
-          return this.handleResponse<T>(retryResponse);
-        }
-      } catch {
-        await this.setAccessToken(null);
-        await this.setRefreshToken(null);
-      }
+    let abortTimeout: ReturnType<typeof setTimeout> | undefined;
+    let signal = options.signal;
+    if (!signal && typeof AbortController !== 'undefined') {
+      const controller = new AbortController();
+      signal = controller.signal;
+      abortTimeout = setTimeout(() => {
+        controller.abort();
+      }, 15000);
     }
 
-    return this.handleResponse<T>(response);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        signal,
+        credentials: options.credentials || 'include',
+      });
+
+      if (response.status === 401 && requireAuth && !endpoint.includes('/auth/refresh')) {
+        // Trigger silent token refresh
+        try {
+          const refreshedToken = await this.performSilentRefresh();
+          if (refreshedToken) {
+            headers.set('Authorization', `Bearer ${refreshedToken}`);
+            const retryResponse = await fetch(url, {
+              ...options,
+              headers,
+              signal,
+              credentials: options.credentials || 'include',
+            });
+            return this.handleResponse<T>(retryResponse);
+          }
+        } catch {
+          await this.setAccessToken(null);
+          await this.setRefreshToken(null);
+        }
+      }
+
+      return this.handleResponse<T>(response);
+    } finally {
+      if (abortTimeout) {
+        clearTimeout(abortTimeout);
+      }
+    }
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
@@ -228,8 +249,8 @@ export class UniTrackApiClient {
 
   private async performSilentRefresh(): Promise<string | null> {
     if (this.isRefreshing) {
-      return new Promise<string>((resolve) => {
-        this.refreshSubscribers.push(resolve);
+      return new Promise<string>((resolve, reject) => {
+        this.refreshSubscribers.push({ resolve, reject });
       });
     }
 
@@ -249,9 +270,13 @@ export class UniTrackApiClient {
         await this.setRefreshToken(res.refreshToken);
       }
 
-      this.refreshSubscribers.forEach((callback) => callback(res.accessToken));
+      this.refreshSubscribers.forEach((subscriber) => subscriber.resolve(res.accessToken));
       this.refreshSubscribers = [];
       return res.accessToken;
+    } catch (err) {
+      this.refreshSubscribers.forEach((subscriber) => subscriber.reject(err));
+      this.refreshSubscribers = [];
+      throw err;
     } finally {
       this.isRefreshing = false;
     }

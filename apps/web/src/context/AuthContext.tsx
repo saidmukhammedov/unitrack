@@ -19,27 +19,72 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+const SESSION_INDICATOR_KEY = 'unitrack_has_session';
 
-  // Attempt initial session restore via silent refresh
+function getHasPriorSession(): boolean {
+  try {
+    return typeof window !== 'undefined' && localStorage.getItem(SESSION_INDICATOR_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function setSessionActive(active: boolean) {
+  try {
+    if (active) {
+      localStorage.setItem(SESSION_INDICATOR_KEY, '1');
+    } else {
+      localStorage.removeItem(SESSION_INDICATOR_KEY);
+    }
+  } catch {}
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const hasPriorSession = getHasPriorSession();
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(hasPriorSession);
+
+  // Attempt initial session restore via silent refresh ONLY if a session previously existed
   useEffect(() => {
+    if (!hasPriorSession) {
+      // First-time or logged-out visitor: immediately render without blocking
+      setIsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
     async function restoreSession() {
       try {
-        const profile = await api.getMe();
-        setUser(profile);
+        // Enforce a strict 3000ms timeout so a sleeping/cold backend never blocks the user indefinitely
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('SESSION_RESTORE_TIMEOUT')), 3000)
+        );
+        const profile = await Promise.race([api.getMe(), timeoutPromise]);
+        if (isMounted) {
+          setUser(profile);
+          setSessionActive(true);
+        }
       } catch {
-        setUser(null);
+        if (isMounted) {
+          setUser(null);
+          setSessionActive(false);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
+
     restoreSession();
-  }, []);
+    return () => {
+      isMounted = false;
+    };
+  }, [hasPriorSession]);
 
   const login = async (input: LoginInput) => {
     const res = await api.login(input);
+    setSessionActive(true);
     setUser(res.user);
   };
 
@@ -50,6 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: input.email,
         password: input.password,
       });
+      setSessionActive(true);
       setUser(loginRes.user);
       return 'Welcome to UniTrack! Account created successfully.';
     } catch {
@@ -59,11 +105,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const googleAuth = async (input: GoogleAuthInput) => {
     const res = await api.googleAuth(input);
+    setSessionActive(true);
     setUser(res.user);
   };
 
   const logout = async () => {
-    await api.logout();
+    setSessionActive(false);
+    try {
+      await api.logout();
+    } catch {}
     setUser(null);
   };
 
@@ -71,8 +121,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const profile = await api.getMe();
       setUser(profile);
+      setSessionActive(true);
     } catch {
       setUser(null);
+      setSessionActive(false);
     }
   };
 
