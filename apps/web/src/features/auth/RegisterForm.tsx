@@ -32,7 +32,15 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       const msg = await registerUser(data);
       setSuccessMessage(msg);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Registration failed. Please check your details.');
+      if (
+        err?.name === 'AbortError' ||
+        err?.message?.includes('aborted') ||
+        err?.code === 'REQUEST_TIMEOUT'
+      ) {
+        setErrorMessage('The server is taking longer than usual to respond. It may be waking up from sleep. Please try submitting again.');
+      } else {
+        setErrorMessage(err.message || 'Registration failed. Please check your details.');
+      }
     }
   };
 

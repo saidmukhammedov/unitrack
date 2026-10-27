@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginInputSchema, type LoginInput } from '@unitrack/contracts';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../lib/api';
 import { Mail, Lock, AlertCircle, ArrowRight, BookOpen } from 'lucide-react';
 
 interface LoginFormProps {
@@ -14,6 +15,11 @@ export function LoginForm({ onSwitchToRegister, onSwitchToForgotPassword }: Logi
   const { login, googleAuth } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // Proactively ping health endpoint to wake up sleeping backend on Render
+  useEffect(() => {
+    api.getHealth().catch(() => {});
+  }, []);
 
   const {
     register,
@@ -29,7 +35,15 @@ export function LoginForm({ onSwitchToRegister, onSwitchToForgotPassword }: Logi
     try {
       await login(data);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Login failed. Please check your credentials.');
+      if (
+        err?.name === 'AbortError' ||
+        err?.message?.includes('aborted') ||
+        err?.code === 'REQUEST_TIMEOUT'
+      ) {
+        setErrorMessage('The server is taking longer than usual to respond. It may be waking up from sleep. Please try signing in again.');
+      } else {
+        setErrorMessage(err.message || 'Login failed. Please check your credentials.');
+      }
     }
   };
 

@@ -186,9 +186,10 @@ export class UniTrackApiClient {
     if (!signal && typeof AbortController !== 'undefined') {
       const controller = new AbortController();
       signal = controller.signal;
+      // 60-second timeout allows sufficient time for sleeping cloud instances (Render free-tier) to warm up
       abortTimeout = setTimeout(() => {
         controller.abort();
-      }, 15000);
+      }, 60000);
     }
 
     try {
@@ -220,6 +221,15 @@ export class UniTrackApiClient {
       }
 
       return this.handleResponse<T>(response);
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || err?.message?.includes('aborted')) {
+        throw new ApiError(
+          408,
+          'REQUEST_TIMEOUT',
+          'The server is taking longer than usual to respond. It may be waking up from sleep. Please try again.'
+        );
+      }
+      throw err;
     } finally {
       if (abortTimeout) {
         clearTimeout(abortTimeout);
